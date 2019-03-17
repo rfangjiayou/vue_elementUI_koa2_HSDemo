@@ -1,0 +1,162 @@
+<template>
+    <div id='ContentRewritePolicy' v-loading="this.pictLoading" element-loading-spinner="el-icon-loading" element-loading-text="加载中">
+		<Tbar v-on:add='openNewOrEditWin' @deleteData='deleteData'/>
+		<el-dialog title="内容改写策略配置" @open='initWin' :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
+			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin'/>
+		</el-dialog>
+        <el-table
+			ref="multipleTable"
+			:data="tableData"
+			stripe
+			tooltip-effect="dark"
+			size='mini'
+			style="width: 100%"
+			@select='handleSelectionChange'
+			@select-all='handleSelectionChange'>
+				<el-table-column
+					type="selection"
+					width="55">
+				</el-table-column>
+				<el-table-column
+					prop="name"
+					label="名称">
+				</el-table-column>
+				<el-table-column
+					prop="actionDirection"
+					label="方向"
+					:formatter="renderDirection">
+				</el-table-column>
+				<el-table-column
+					prop="action"
+					label="动作"
+					:formatter="renderAction">
+				</el-table-column>
+				<el-table-column
+					prop="description"
+					label="描述">
+				</el-table-column>
+    	</el-table>
+		<el-footer style='height:35px;'>
+			<PageBar/>
+		</el-footer>
+    </div>
+</template>
+
+<script>
+	import Bus from '../../../bus/bus.js';
+	import PageBar from '../../PageBar.vue';
+	import Tbar from '../../Tbar.vue';
+	import CRPolicyForm from './CRPolicyForm.vue';
+
+  	export default {
+		props : {
+
+		}, 
+		data() {
+			return {
+				editBtn : true,
+				delBtn : true,
+				dialogVisible: false,
+				pictLoading : false,
+				selection : [],
+				tableData : []
+			}
+		},
+		
+		components : {
+			'PageBar' : PageBar,
+			'Tbar' : Tbar,
+			'CRPolicyForm' : CRPolicyForm
+		},
+
+		methods: {
+			handleSelectionChange(selection, row) {
+				this.selection = selection;
+				if(selection.length > 0){
+					this.delBtn = false;
+				}else{
+					this.delBtn = true;
+				}
+
+				if(selection.length == 1){
+					this.editBtn = false;
+				}else{
+					this.editBtn = true;
+				}
+				Bus.$emit('btnChange', [this.editBtn, this.delBtn]);
+			},
+			openNewOrEditWin () {
+				this.dialogVisible = true;
+			},
+			initWin () {
+				Bus.$emit('initWin');
+			},
+			closeWin () {
+				this.dialogVisible = false;
+			},
+			deleteData () {
+				var api = '/api/policy/deleteObject',
+					params = this.selection;
+				this.$axios.delete(api, {
+					/* headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}, */
+					data : params
+				})
+				.then((response) => {
+					if(response.status == 200){
+
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+			},
+			renderData (value) {
+				this.tableData = value;
+				this.pictLoading = false;
+			},
+			renderDirection (row, column, cellValue, index) {
+				if(cellValue == 1){
+					cellValue = '请求';
+				}else if(cellValue == 2) {
+					cellValue = '响应';
+				}
+				return cellValue;
+			},
+			renderAction (row, column, cellValue, index) {
+				if(cellValue == 1){
+					cellValue = 'URL';
+				}else if(cellValue == 2) {
+					cellValue = '头部';
+				}else if(cellValue == 3) {
+					cellValue = '响应体';
+				}
+				return cellValue;
+			}
+		},
+		mounted() {
+			Bus.$on('crpolicyLoadSuccess', (val) => {
+				this.renderData(val);
+			});
+		},
+		beforeDestroy () {
+			Bus.$off('crpolicyLoadSuccess');
+		}
+  	}
+</script>
+
+<style scoped>
+	.el-footer {
+		position : absolute;
+		left : 200px;
+		right : 0px;
+		bottom : 0px;
+		background-color:white;
+		color: #333;
+		text-align: right;
+		border-top:1px solid #d0d0d0;
+		border-left:1px solid #d0d0d0;
+		border-right:1px solid #d0d0d0;
+	}
+</style>
