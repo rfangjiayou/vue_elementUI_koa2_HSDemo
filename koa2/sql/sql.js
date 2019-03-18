@@ -1,19 +1,54 @@
 const mysql = require('mysql');
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
     host     : '127.0.0.1',            // 数据库地址
     user     : 'root',                 // 数据库用户
-    password : 'admin',               // 数据库密码
+    password : 'hillstone',               // 数据库密码
     database : 'hsdemo'              // 选中数据库
 });
 
-module.exports = {
-    async getObject() {
-        connection.query('SELECT * FROM cr_policy',  (error, results, fields) => {
-            if (error) throw error
-            // connected! 
-            
-            // 结束会话
-            connection.release() 
-        });
+let mysqlDao = {
+    query : function(sql, values) {
+        return new Promise((resolve, reject) => {
+            connection.getConnection(function(error, connection) {
+                if (error) {
+                    reject(error);
+                } else {
+                    connection.query(sql, values, (error, rows) => {
+                        if (error) {
+                            reject(error);
+                        } else {
+                            resolve(rows);
+                        }
+                        connection.release();
+                    })
+                }
+            })
+        })
+    },
+
+    getData : function(tableName) {
+        let sql = 'SELECT * FROM ' + tableName;
+        return mysqlDao.query(sql);
     }
-}
+};
+
+/* let query = function(sql, values) {
+    return new Promise((resolve, reject ) => {
+        connection.getConnection(function(error, connection) {
+            if (error) {
+                reject(error)
+            } else {
+                connection.query(sql, values, (error, rows) => {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(rows)
+                    }
+                    connection.release()
+                })
+            }
+        })
+    })
+} */
+  
+module.exports = mysqlDao;

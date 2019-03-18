@@ -1,13 +1,23 @@
-var sql = require('../sql/sql');
+const mysqlObj = require('../sql/sql');
 
-module.exports = {
-    async getObject(ctx, next) {
+let policy = {
+    getObject : async function (ctx, next) {
         try {
-            let policyList = sql.getObject();
-            ctx.body = {
-                code: 200,
-                list: policyList
-            }
+            let tablename = 'cr_policy';
+
+            await mysqlObj.getData(tablename)
+                .then((data) => {
+                    let policyList = data;
+                    ctx.body = {
+                        code: 200,
+                        list: policyList
+                    }
+                })
+                .catch((error) => {
+                    ctx.body = {
+                        data: error
+                    }
+                });
         } catch (e) {
             console.log(e);
             ctx.body = {
@@ -16,4 +26,6 @@ module.exports = {
             }
         }
     }
-}
+};
+
+module.exports = policy;
