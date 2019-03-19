@@ -6,49 +6,30 @@ const connection = mysql.createPool({
     database : 'hsdemo'              // 选中数据库
 });
 
-let mysqlDao = {
-    query : function(sql, values) {
-        return new Promise((resolve, reject) => {
-            connection.getConnection(function(error, connection) {
-                if (error) {
-                    reject(error);
-                } else {
-                    connection.query(sql, values, (error, rows) => {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            resolve(rows);
-                        }
-                        connection.release();
-                    })
-                }
-            })
-        })
-    },
-
-    getData : function(tableName) {
-        let sql = 'SELECT * FROM ' + tableName;
-        return mysqlDao.query(sql);
-    }
-};
-
-/* let query = function(sql, values) {
-    return new Promise((resolve, reject ) => {
+let query = function(sql, values) {
+    return new Promise((resolve, reject) => {
         connection.getConnection(function(error, connection) {
             if (error) {
-                reject(error)
+                reject(error);
             } else {
                 connection.query(sql, values, (error, rows) => {
-                    if (err) {
-                        reject(err)
+                    if (error) {
+                        reject(error);
                     } else {
-                        resolve(rows)
+                        resolve(rows);
                     }
-                    connection.release()
-                })
+                    connection.release();
+                });
             }
         })
     })
-} */
-  
+};
+
+let mysqlDao = {
+    getData : function(tableName) {
+        let sql = 'SELECT * FROM ' + tableName;
+        return query(sql);
+    }
+};
+
 module.exports = mysqlDao;

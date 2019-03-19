@@ -1,15 +1,6 @@
 var router = require('koa-router')();
+var policy = require('./policy');
 
-router.get('/', function *(next) {
-    yield this.render('index', {
-        title: 'Hello World Koa!'
-    });
-});
-
-router.get('/foo', function *(next) {
-	yield this.render('index', {
-		title: 'Hello World foo!'
-	});
-});
+router.use('/policy', policy.routes(), policy.allowedMethods());
 
 module.exports = router;
