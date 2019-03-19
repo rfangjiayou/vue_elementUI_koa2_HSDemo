@@ -1,30 +1,24 @@
-var koa = require('koa')
-  , logger = require('koa-logger')
-  , json = require('koa-json')
-  , views = require('koa-views')
-  , onerror = require('koa-onerror')
-  , cors = require('koa-cors');
+let koa = require('koa'), 
+	logger = require('koa-logger'), 
+	json = require('koa-json'), 
+	onerror = require('koa-onerror'), 
+	cors = require('koa-cors');
 
-var app = new koa();
-var index = require('./routes/index');
+let app = new koa();
+let index = require('./routes/index');
+let response = require('./middleware/response');
 
 //=========================================================================
-//贼jier重要，既是入口也是出口
-app.use(async (ctx, next) => {
-	await next();
-	// ctx.body = ctx.request.body;
-})
+//中间件，贼jier重要，既是入口也是出口
+app.use(response);
 //=========================================================================
 
 // error handler
 onerror(app);
 
-// global middlewares
-/* app.use(views('views', {
-	root: __dirname + '/views',
-	default: 'jade'
-})); */
-app.use(require('koa-bodyparser')());
+app.use(require('koa-bodyparser')({
+	enableTypes:['json', 'form', 'text']
+}));
 app.use(json());
 app.use(logger());
 

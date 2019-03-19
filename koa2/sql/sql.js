@@ -2,7 +2,7 @@ const mysql = require('mysql');
 const connection = mysql.createPool({
     host     : '127.0.0.1',            // 数据库地址
     user     : 'root',                 // 数据库用户
-    password : 'hillstone',               // 数据库密码
+    password : 'admin',               // 数据库密码
     database : 'hsdemo'              // 选中数据库
 });
 

@@ -1,25 +1,14 @@
 const mysqlObj = require('../sql/sql');
 
-let policy = {
-    getObject : async function (ctx, next) {
+class policy{
+
+    static async getObject (ctx, next) {
         try {
             let tablename = 'cr_policy';
 
-            await mysqlObj.getData(tablename)
-                .then((data) => {
-                    let policyList = data;
-                    ctx.body = {
-                        code: 200,
-                        list: policyList
-                    }
-                })
-                .catch((error) => {
-                    ctx.body = {
-                        data: error
-                    }
-                });
+            let returnData = await mysqlObj.getData(tablename);
+            ctx.body = returnData;
         } catch (e) {
-            console.log(e);
             ctx.body = {
                 code: 500,
                 msg: e
