@@ -1,3 +1,9 @@
+/*
+
+原始方法，暂时不使用
+
+*/
+
 const mysql = require('mysql');
 const connection = mysql.createPool({
     host     : '127.0.0.1',            // 数据库地址
