@@ -17,7 +17,7 @@ module.exports = (sequelize, dataTypes) => {
             field : 'actionDirection'
         },
         match : {
-            type : dataTypes.TEXT,
+            type : dataTypes.JSON,
             allowNull : true,
             field : 'match'
         },
