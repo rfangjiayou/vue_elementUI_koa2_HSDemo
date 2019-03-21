@@ -227,7 +227,8 @@
 						var api = '/api/policy/createObject';
 						this.CRPolicyForm.match = this.matchList;
 
-						this.$axios.post(api, this.$qs.stringify(this.CRPolicyForm))
+						//this.$qs.stringify(this.CRPolicyForm)      需要formData的时候在传这个
+						this.$axios.post(api, this.CRPolicyForm)
 						.then((response) => {
 							if(response.status == 200){
 								this.$emit('closeWin');
