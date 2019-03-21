@@ -40,10 +40,10 @@
         },
         methods : {
             add () {
-                this.$emit('add');
+                this.$emit('add', 'add');
             },
             edit () {
-                this.$emit('edit');
+                this.$emit('edit', 'edit');
             },
             deleteData () {
                 this.$emit('deleteData');

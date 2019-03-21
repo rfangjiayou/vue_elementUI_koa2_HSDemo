@@ -17,7 +17,6 @@ class controllerPolicy {
     static async createObject (ctx, next) {
         try {
             let req = ctx.request.body;
-            req.match = JSON.stringify(req.match);
             let returnData = await policyModel.createObject(req);
             ctx.body = returnData;
         } catch (err) {

@@ -1,8 +1,8 @@
 <template>
     <div id='ContentRewritePolicy' v-loading="this.pictLoading" element-loading-spinner="el-icon-loading" element-loading-text="加载中">
 		<Tbar v-on:add='openNewOrEditWin' @edit='openNewOrEditWin' @deleteData='deleteData'/>
-		<el-dialog title="内容改写策略配置" @open='initWin' :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
-			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin'/>
+		<el-dialog title="内容改写策略配置" :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
+			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin' :mode='this.mode'/>
 		</el-dialog>
         <el-table
 			ref="multipleTable"
@@ -63,6 +63,7 @@
 				delBtn : true,
 				dialogVisible: false,
 				pictLoading : false,
+				mode : '',
 				selection : [],
 				tableData : []
 			}
@@ -90,12 +91,28 @@
 				}
 				Bus.$emit('btnChange', [this.editBtn, this.delBtn]);
 			},
-			openNewOrEditWin () {
+			openNewOrEditWin (mode) {
+				this.mode = mode;
 				this.dialogVisible = true;
-				me.initWin();
 			},
-			initWin () {
-				Bus.$emit('initWin');
+			fill (formValue, matchList) {
+				var record = this.selection[0];
+				if(record){
+					for(var i in record){
+						if(formValue.hasOwnProperty(i) && i != 'match'){
+							formValue[i] = record[i];
+						}
+					}
+					var match = JSON.parse(record.match);
+					if(Array.isArray(match)){
+						//不能改变matchList的引用
+						match.forEach(element => {
+							matchList.push(element);
+						});
+					}else{
+						matchList.push(match);
+					}
+				}
 			},
 			closeWin () {
 				this.dialogVisible = false;
@@ -146,9 +163,15 @@
 			Bus.$on('crpolicyLoadSuccess', (val) => {
 				this.renderData(val);
 			});
+			Bus.$on('fillCRForm', (value) => {
+				if(this.mode == 'edit'){
+					this.fill(value[0], value[1]);
+				}
+			});
 		},
 		beforeDestroy () {
 			Bus.$off('crpolicyLoadSuccess');
+			Bus.$off('fillCRForm');
 		}
   	}
 </script>
