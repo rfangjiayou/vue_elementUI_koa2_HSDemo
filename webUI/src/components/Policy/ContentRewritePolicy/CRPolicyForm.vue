@@ -154,6 +154,7 @@
 							{value : 3, label : 'Location'}];
 
 	export default {
+		props : ['mode'],
 		data() {
 			return {
 				matchObj : {
@@ -197,12 +198,12 @@
 			closeWin () {
 				this.$emit('closeWin');
 			},
-			initWin () {
+			/* initWin () {
 				this.$refs['matchObject'].resetField();
 				this.$refs['matchObjectName'].resetField();
 				this.$refs['matchOperator'].resetField();
 				this.$refs['matchRegtext'].resetField();
-			},
+			}, */
 			addMatch (formName) {
 				if(this.$refs[formName]){
 					this.$refs[formName].validate((valid) => {
@@ -221,39 +222,47 @@
 					});
 				}
 			},
+			fill (record) {
+				record.forEach(element => {
+					
+				});
+			},
 			submit () {
-				this.$refs['CRPolicyForm'].validate((valid) => {
+				if(this.mode == 'add'){
+					this.$refs['CRPolicyForm'].validate((valid) => {
 					if (valid) {
 						var api = '/api/policy/createObject';
 						this.CRPolicyForm.match = this.matchList;
 
 						//this.$qs.stringify(this.CRPolicyForm)      需要formData的时候在传这个
 						this.$axios.post(api, this.CRPolicyForm)
-						.then((response) => {
-							if(response.status == 200){
-								this.$emit('closeWin');
-								Bus.$emit('loadCRPolicy');
-							}
-						})
-						.catch((error) => {
-							console.log(error);
-						});
-					} else {
-						return false;
-					}
-				});
+							.then((response) => {
+								if(response.status == 200){
+									this.$emit('closeWin');
+									Bus.$emit('loadCRPolicy');
+								}
+							})
+							.catch((error) => {
+								console.log(error);
+							});
+						} else {
+							return false;
+						}
+					});
+				}else if(this.mode == 'edit') {
+					console.log('asssss');
+				}
+				
 			}
 		},
 		mounted () {
-			Bus.$on('initWin', () => {
-				this.initWin();
-			});
 			Bus.$on('addMatch', () => {
 				this.addMatch('CRPolicyMatchForm');
 			});
+			
+			Bus.$emit('fillCRForm', [this.CRPolicyForm, this.matchList]);
 		},
 		beforeDestroy () {
-			Bus.$off('initWin');
 			Bus.$off('addMatch');
 		}
 	};
