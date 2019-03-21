@@ -13,7 +13,8 @@
                 size="mini" 
                 icon="el-icon-edit" 
                 plain 
-                :disabled='editBtn'>编辑
+                :disabled='editBtn'
+                @click='edit'>编辑
             </el-button>
 			<el-button 
                 type="danger" 
@@ -40,6 +41,9 @@
         methods : {
             add () {
                 this.$emit('add');
+            },
+            edit () {
+                this.$emit('edit');
             },
             deleteData () {
                 this.$emit('deleteData');

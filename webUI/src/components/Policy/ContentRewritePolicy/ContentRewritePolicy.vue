@@ -1,6 +1,6 @@
 <template>
     <div id='ContentRewritePolicy' v-loading="this.pictLoading" element-loading-spinner="el-icon-loading" element-loading-text="加载中">
-		<Tbar v-on:add='openNewOrEditWin' @deleteData='deleteData'/>
+		<Tbar v-on:add='openNewOrEditWin' @edit='openNewOrEditWin' @deleteData='deleteData'/>
 		<el-dialog title="内容改写策略配置" @open='initWin' :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
 			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin'/>
 		</el-dialog>
@@ -16,6 +16,11 @@
 				<el-table-column
 					type="selection"
 					width="55">
+				</el-table-column>
+				<el-table-column
+					prop="id"
+					label="ID"
+					width=180>
 				</el-table-column>
 				<el-table-column
 					prop="name"
@@ -87,6 +92,7 @@
 			},
 			openNewOrEditWin () {
 				this.dialogVisible = true;
+				me.initWin();
 			},
 			initWin () {
 				Bus.$emit('initWin');
@@ -105,7 +111,8 @@
 				})
 				.then((response) => {
 					if(response.status == 200){
-
+						Bus.$emit('loadCRPolicy');
+						Bus.$emit('btnChange', [true, true]);
 					}
 				})
 				.catch((error) => {
