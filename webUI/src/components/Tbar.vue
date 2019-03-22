@@ -46,7 +46,23 @@
                 this.$emit('edit', 'edit');
             },
             deleteData () {
-                this.$emit('deleteData');
+                this.$confirm('此操作将永久删除条记录, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    closeOnClickModal : false,
+                    type: 'warning'
+                })
+                .then((action) => {
+                    if(action == 'confirm'){
+                        this.$emit('deleteData');
+                    }
+                })
+                .catch(() => {
+                    /* this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });  */         
+                });
             }
         },
         mounted () {
@@ -54,9 +70,51 @@
                 this.editBtn = val[0];
                 this.delBtn = val[1];
             });
+            Bus.$on('addSuccess', () => {
+                this.$message({
+                    type: 'success',
+                    message: '新建成功!'
+                });
+            });
+            Bus.$on('addFail', () => {
+                this.$message({
+                    type: 'error',
+                    message: '新建失败!'
+                });
+            });
+            Bus.$on('editSuccess', () => {
+                this.$message({
+                    type: 'success',
+                    message: '编辑成功!'
+                });
+            });
+            Bus.$on('editFail', () => {
+                this.$message({
+                    type: 'error',
+                    message: '编辑失败!'
+                });
+            });
+            Bus.$on('deleteSuccess', () => {
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            });
+            Bus.$on('deleteFail', () => {
+                this.$message({
+                    type: 'error',
+                    message: '删除失败!'
+                });
+            });
         },
         beforeDestroy () {
 			Bus.$off('btnChange');
+			Bus.$off('addSuccess');
+			Bus.$off('addFail');
+			Bus.$off('editSuccess');
+			Bus.$off('editFail');
+			Bus.$off('deleteSuccess');
+			Bus.$off('deleteFail');
 		}
   	}
 </script>

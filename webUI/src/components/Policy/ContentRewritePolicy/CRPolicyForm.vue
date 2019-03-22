@@ -222,37 +222,47 @@
 					});
 				}
 			},
-			fill (record) {
-				record.forEach(element => {
-					
-				});
-			},
 			submit () {
-				if(this.mode == 'add'){
-					this.$refs['CRPolicyForm'].validate((valid) => {
+				this.$refs['CRPolicyForm'].validate((valid) => {
 					if (valid) {
-						var api = '/api/policy/createObject';
 						this.CRPolicyForm.match = this.matchList;
 
-						//this.$qs.stringify(this.CRPolicyForm)      需要formData的时候在传这个
-						this.$axios.post(api, this.CRPolicyForm)
-							.then((response) => {
-								if(response.status == 200){
-									this.$emit('closeWin');
-									Bus.$emit('loadCRPolicy');
-								}
-							})
-							.catch((error) => {
-								console.log(error);
-							});
-						} else {
-							return false;
+						if(this.mode == 'add'){
+							let api = '/api/policy/createObject';
+
+							//this.$qs.stringify(this.CRPolicyForm)      需要formData的时候在传这个
+							this.$axios.post(api, this.CRPolicyForm)
+								.then((response) => {
+									if(response.status == 200){
+										this.$emit('closeWin');
+										Bus.$emit('addSuccess');
+										Bus.$emit('loadCRPolicy');
+									}
+								})
+								.catch((error) => {
+									Bus.$emit('addFail');
+									console.log(error);
+								});
+						}else if(this.mode == 'edit') {
+							let api = '/api/policy/updateObject';
+
+							this.$axios.put(api, this.CRPolicyForm)
+								.then((response) => {
+									if(response.status == 200){
+										this.$emit('closeWin');
+										Bus.$emit('editSuccess');
+										Bus.$emit('loadCRPolicy');
+									}
+								})
+								.catch((error) => {
+									Bus.$emit('editFail');
+									console.log(error);
+								});
 						}
-					});
-				}else if(this.mode == 'edit') {
-					console.log('asssss');
-				}
-				
+					}else {
+						return false;
+					}
+				});
 			}
 		},
 		mounted () {

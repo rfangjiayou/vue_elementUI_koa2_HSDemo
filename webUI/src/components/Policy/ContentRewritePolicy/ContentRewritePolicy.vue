@@ -1,5 +1,5 @@
 <template>
-    <div id='ContentRewritePolicy' v-loading="this.pictLoading" element-loading-spinner="el-icon-loading" element-loading-text="加载中">
+    <div id='ContentRewritePolicy' >
 		<Tbar v-on:add='openNewOrEditWin' @edit='openNewOrEditWin' @deleteData='deleteData'/>
 		<el-dialog title="内容改写策略配置" :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
 			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin' :mode='this.mode'/>
@@ -42,7 +42,7 @@
 				</el-table-column>
     	</el-table>
 		<el-footer style='height:35px;'>
-			<PageBar/>
+			<PageBar :total='this.total'/>
 		</el-footer>
     </div>
 </template>
@@ -54,15 +54,13 @@
 	import CRPolicyForm from './CRPolicyForm.vue';
 
   	export default {
-		props : {
-
-		}, 
+		props : [], 
 		data() {
 			return {
 				editBtn : true,
 				delBtn : true,
 				dialogVisible: false,
-				pictLoading : false,
+				total : '',
 				mode : '',
 				selection : [],
 				tableData : []
@@ -76,6 +74,72 @@
 		},
 
 		methods: {
+			openNewOrEditWin (mode) {
+				this.mode = mode;
+				this.dialogVisible = true;
+			},
+			fill (formValue, matchList) {
+				var record = this.selection[0];
+				if(record){
+					for(var i in record){
+						if(formValue.hasOwnProperty(i) && i != 'match'){
+							formValue[i] = record[i];
+						}
+					}
+					formValue['id'] = record['id'];
+					
+					var match = JSON.parse(record.match);
+					if(Array.isArray(match)){
+						//不能改变matchList的引用
+						match.forEach(element => {
+							matchList.push(element);
+						});
+					}else{
+						matchList.push(match);
+					}
+				}
+			},
+			closeWin () {
+				this.dialogVisible = false;
+			},
+			loadCRPolicy () {
+				var url = '/api/policy/getObject';
+				Bus.$emit('mask');
+                this.$axios.get(url)
+                .then((response) => {
+                    if(response.status == 200){
+						var returnData = response.data;
+						this.total = returnData.length;
+						this.renderData(returnData);
+						Bus.$emit('btnChange', [true, true]);
+						Bus.$emit('unmask');
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            },
+			deleteData () {
+				var api = '/api/policy/deleteObject',
+					params = this.selection;
+				this.$axios.delete(api, {
+					/* headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}, */
+					data : params
+				})
+				.then((response) => {
+					if(response.status == 200){
+						Bus.$emit('deleteSuccess');
+						this.loadCRPolicy();
+						Bus.$emit('btnChange', [true, true]);
+					}
+				})
+				.catch((error) => {
+					Bus.$emit('deleteFail');
+					console.log(error);
+				});
+			},
 			handleSelectionChange(selection, row) {
 				this.selection = selection;
 				if(selection.length > 0){
@@ -91,54 +155,8 @@
 				}
 				Bus.$emit('btnChange', [this.editBtn, this.delBtn]);
 			},
-			openNewOrEditWin (mode) {
-				this.mode = mode;
-				this.dialogVisible = true;
-			},
-			fill (formValue, matchList) {
-				var record = this.selection[0];
-				if(record){
-					for(var i in record){
-						if(formValue.hasOwnProperty(i) && i != 'match'){
-							formValue[i] = record[i];
-						}
-					}
-					var match = JSON.parse(record.match);
-					if(Array.isArray(match)){
-						//不能改变matchList的引用
-						match.forEach(element => {
-							matchList.push(element);
-						});
-					}else{
-						matchList.push(match);
-					}
-				}
-			},
-			closeWin () {
-				this.dialogVisible = false;
-			},
-			deleteData () {
-				var api = '/api/policy/deleteObject',
-					params = this.selection;
-				this.$axios.delete(api, {
-					/* headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}, */
-					data : params
-				})
-				.then((response) => {
-					if(response.status == 200){
-						Bus.$emit('loadCRPolicy');
-						Bus.$emit('btnChange', [true, true]);
-					}
-				})
-				.catch((error) => {
-					console.log(error);
-				});
-			},
 			renderData (value) {
 				this.tableData = value;
-				this.pictLoading = false;
 			},
 			renderDirection (row, column, cellValue, index) {
 				if(cellValue == 1){
@@ -160,17 +178,18 @@
 			}
 		},
 		mounted() {
-			Bus.$on('crpolicyLoadSuccess', (val) => {
-				this.renderData(val);
+			Bus.$on('loadCRPolicy', () => {
+				this.loadCRPolicy();
 			});
 			Bus.$on('fillCRForm', (value) => {
 				if(this.mode == 'edit'){
 					this.fill(value[0], value[1]);
 				}
 			});
+			Bus.$emit('CRPolicyMounted');
 		},
 		beforeDestroy () {
-			Bus.$off('crpolicyLoadSuccess');
+			Bus.$off('loadCRPolicy');
 			Bus.$off('fillCRForm');
 		}
   	}
