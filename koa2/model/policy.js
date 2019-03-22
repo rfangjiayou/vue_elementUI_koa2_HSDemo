@@ -20,6 +20,21 @@ class policyModel {
         });
     }
 
+    static async updateObject (data) {
+        return await policy.update({
+            name : data.name,
+            actionDirection : data.actionDirection,
+            match : data.match,
+            action : data.action,
+            replement : data.replement,
+            description : data.description
+        }, {
+            where : {
+                id : data.id
+            }
+        });
+    }
+
     static async deleteObject (data) {
         return await policy.destroy({
             where : {

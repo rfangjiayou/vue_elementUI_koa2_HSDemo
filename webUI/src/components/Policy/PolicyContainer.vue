@@ -1,28 +1,39 @@
 <template>
     <div class="PolicyContainer">
         <PolicyMenu/>
-        <el-main>
+        <el-main v-loading="this.pictLoading" element-loading-spinner="el-icon-loading" element-loading-text="拼命加载中" element-loading-background="rgba(0, 0, 0, 0.3)">
             <router-view></router-view>
         </el-main>
     </div>
 </template>
 
 <script>
+import Bus from '../../bus/bus.js';
 import PolicyMenu from './PolicyMenu.vue';
-import SecurityPolicy from './SecurityPolicy/SecurityPolicy.vue';
 
 export default {
 	data () {
 		return {
-			// msg: 'Welcome to Your Vue.js App'
+			pictLoading : false
 		}
 	},
 	components : {
-		'PolicyMenu' : PolicyMenu,
-		'SecurityPolicy' : SecurityPolicy
-	},
+		'PolicyMenu' : PolicyMenu
+    },
+    methods : {
+    },
 	mounted () {
-	}
+        Bus.$on('mask', () => {
+            this.pictLoading = true;
+        });
+        Bus.$on('unmask', () => {
+            this.pictLoading = false;
+        });
+    },
+    beforeDestroy () {
+        Bus.$off('mask');
+        Bus.$off('unmask');
+    }
 }
 </script>
 

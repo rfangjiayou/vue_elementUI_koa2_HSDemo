@@ -35,35 +35,21 @@
         methods: {
             handleChange(self) {
                 if(self.index == '/policy/crpolicy'){
-                    this.loadCRPolicy();
+                    Bus.$emit('loadCRPolicy');
                 }
             },
             handleOpen(key, keyPath) {
             },
             handleClose(key, keyPath) {
-            },
-            loadCRPolicy () {
-                var url = '/api/policy/getObject';
-                this.$axios.get(url)
-                .then((response) => {
-                    if(response.status == 200){
-                        var returnData = response.data;
-                        Bus.$emit('crpolicyLoadSuccess', returnData);
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
             }
         },
         mounted () {
-            Bus.$on('loadCRPolicy', () => {
-				this.loadCRPolicy();
+            Bus.$on('CRPolicyMounted', () => {
+				Bus.$emit('loadCRPolicy');
 			});
-            this.loadCRPolicy();
         },
         beforeDestroy () {
-			Bus.$off('loadCRPolicy');
+			Bus.$off('CRPolicyMounted');
 		}
     }
 </script>

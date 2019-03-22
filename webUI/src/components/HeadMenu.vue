@@ -13,6 +13,12 @@
             {{ item.item }}
             </el-menu-item>
         </el-menu>
+        <el-button 
+            type="info"
+            size="mini" 
+            icon="el-icon-setting" 
+            >注销
+        </el-button>
     </div>
 </template>
 
@@ -44,5 +50,11 @@
     .el-menu {
         display : inline-block;
         float: none;
+    }
+    .el-button {
+        background-color:#545c64;
+        position: absolute;
+        top : 15px;
+        right : 10px;
     }
 </style>

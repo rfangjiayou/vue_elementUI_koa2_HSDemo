@@ -27,6 +27,23 @@ class controllerPolicy {
         }
     }
 
+    static async updateObject (ctx, next) {
+        try {
+            let req = ctx.request.body;
+            if(req.id){
+                let returnData = await policyModel.updateObject(req);
+                ctx.body = returnData;
+            }else{
+                ctx.throw(500);
+            }
+        } catch (err) {
+            ctx.response.status = err.statusCode || err.status || 500;
+            ctx.response.body = {
+                message: err.message
+            };
+        }
+    }
+
     static async deleteObject (ctx, next) {
         try {
             let req = ctx.request.body;
