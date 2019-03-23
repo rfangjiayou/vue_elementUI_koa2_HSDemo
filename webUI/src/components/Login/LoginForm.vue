@@ -1,6 +1,6 @@
 <template>
 	<div id='LoginForm'>
-		<el-form ref="LoginForm" :model="LoginForm" label-width="70px" label-position='left' class="demo-ruleForm">
+		<el-form ref="LoginForm" :model="LoginForm" :rules='rules' label-width="70px" label-position='left' class="demo-ruleForm">
             <el-form-item prop="username" size='mini'>
 				<el-col :span="22">
 					<el-input placeholder="请输入用户名" v-model="LoginForm.username"></el-input>
@@ -16,7 +16,7 @@
 					<el-button type="primary" size="mini" plain @click="login">登录</el-button>
 				</el-col>
                 <el-col :span="4" :offset='4'>
-					<el-button type="primary" size="mini" plain>注册
+					<el-button type="primary" size="mini" plain @click="register">注册
                     </el-button>
 				</el-col>
             </el-row>
@@ -36,6 +36,10 @@
                 LoginForm : {
                     username : '',
                     password : ''
+                },
+                rules : {
+                    username : [{required: true, message: '不能为空', trigger: 'blur' }],
+                    password : [{required: true, message: '不能为空', trigger: 'blur' }]
                 }
 			};
 		},
@@ -43,8 +47,30 @@
 		},
 		methods: {
             login () {
-                this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
-                // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
+                this.$refs['LoginForm'].validate((valid) => {
+                    if (valid) {
+                        var api = '/api/login/login';
+                        this.$axios.post(api, this.LoginForm)
+                            .then((response) => {
+                                if(response.status == 200){
+                                    this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
+                                    // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
+                                }else{
+                                    this.$message({
+                                        type: 'error',
+                                        message: '用户名或密码错误'
+                                    });
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                    }
+                });
+            },
+
+            register () {
+
             }
 		},
 		mounted () {
