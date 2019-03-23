@@ -23,6 +23,8 @@ Vue.prototype.$qs = qs;
 
 Vue.config.productionTip = false
 
+require('./assets/js/main.js')
+
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
