@@ -1,16 +1,25 @@
 <template>
 	<div id="app">
-		<BaseLayout/>
+		<router-view></router-view>
+		<!-- <BaseLayout/> -->
 	</div>
 </template>
 
 <script>
 import BaseLayout from './components/BaseLayout'
+import LoginContainer from './components/Login/LoginContainer.vue'
 
 export default {
 	name: 'App',
 	components: {
-		'BaseLayout' : BaseLayout
+		'BaseLayout' : BaseLayout,
+		'LoginContainer' : LoginContainer,
+	},
+	methods: {
+		
+	},
+	mounted() {
+		this.$router.push({path : '/login', name : 'login', component: LoginContainer});
 	}
 }
 </script>
@@ -27,5 +36,6 @@ export default {
 html body {
 	height: 100%;
     margin : 0;
+	overflow: hidden;
 }
 </style>

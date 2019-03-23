@@ -22,7 +22,7 @@ export default {
 		'HeadMenu' : HeadMenu
 	},
 	mounted () {
-		this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
+		// this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
 	}
 }
 </script>
