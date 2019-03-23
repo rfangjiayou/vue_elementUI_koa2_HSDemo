@@ -17,12 +17,14 @@
             type="info"
             size="mini" 
             icon="el-icon-setting" 
-            >注销
+            @click="logOff">注销
         </el-button>
     </div>
 </template>
 
 <script>
+    import LoginContainer from './Login/LoginContainer.vue'
+
     export default {
         data() {
             return {
@@ -33,6 +35,25 @@
             };
         },
         methods: {
+            logOff () {
+                this.$confirm('是否注销当前用户?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    closeOnClickModal : false,
+                    type: 'warning'
+                })
+                .then((action) => {
+                    if(action == 'confirm'){
+                        this.$router.push({path : '/login', name : 'login', component: LoginContainer});
+                    }
+                })
+                .catch(() => {
+                    /* this.$message({
+                        type: 'info',
+                        message: '已取消注销'
+                    });  */         
+                });
+            },
             handleSelect(key, keyPath) {
                 
             }
