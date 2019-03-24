@@ -1,5 +1,8 @@
 <template>
 	<div id='LoginForm'>
+        <el-dialog title="注册" :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="450px">
+			<registerForm ref='registerForm' v-on:closeWin='closeWin'/>
+		</el-dialog>
 		<el-form ref="LoginForm" :model="LoginForm" :rules='rules' label-width="70px" label-position='left' class="demo-ruleForm">
             <el-form-item prop="username" size='mini'>
 				<el-col :span="22">
@@ -26,6 +29,7 @@
 
 <script>
 	import Bus from '../../bus/bus.js';
+	import registerForm from './registerForm.vue';
 	import PolicyContainer from '../Policy/PolicyContainer.vue';
 	import ContentRewritePolicy from '../Policy/ContentRewritePolicy/ContentRewritePolicy.vue';
 
@@ -33,6 +37,7 @@
 		props : [],
 		data() {
 			return {
+                dialogVisible : false,
                 LoginForm : {
                     username : '',
                     password : ''
@@ -44,8 +49,15 @@
 			};
 		},
 		components :{
+            registerForm : registerForm
 		},
 		methods: {
+            register () {
+				this.dialogVisible = true;
+			},
+            closeWin () {
+				this.dialogVisible = false;
+			},
             login () {
                 this.$refs['LoginForm'].validate((valid) => {
                     if (valid) {
@@ -67,15 +79,15 @@
                             });
                     }
                 });
-            },
-
-            register () {
-
             }
 		},
-		mounted () {
+        mounted () {
+            Bus.$on('closeRegisterForm', () => {
+                this.closeWin();
+            });
 		},
 		beforeDestroy () {
+            Bus.$off('closeRegisterForm');
 		}
 	};
 </script>
