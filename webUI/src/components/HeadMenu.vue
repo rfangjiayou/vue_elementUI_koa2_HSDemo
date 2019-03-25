@@ -5,7 +5,7 @@
         class="el-menu-demo"
         mode="horizontal"
         @select="handleSelect"
-        background-color="#545c64"
+        background-color="#344962"
         text-color="#fff"
         active-text-color="#ffd04b"
         router>
@@ -30,7 +30,8 @@
             return {
                 itemList:[
                     {name:'/policy',item:'策略'},
-                    {name:'/log', item:'日志'}
+                    {name:'/log', item:'日志'},
+                    {name:'/system', item:'系统'}
                 ]
             };
         },
@@ -64,7 +65,7 @@
 <style scoped>
     #HeadMenu {
         height: 60px;
-        background-color:#545c64;
+        background-color:#344962;
         width: 100%;
         text-align: center;
     }
@@ -73,7 +74,7 @@
         float: none;
     }
     .el-button {
-        background-color:#545c64;
+        background-color:#344962;
         position: absolute;
         top : 15px;
         right : 10px;

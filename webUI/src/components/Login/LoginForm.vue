@@ -1,7 +1,7 @@
 <template>
 	<div id='LoginForm'>
         <el-dialog title="注册" :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="450px">
-			<registerForm ref='registerForm' v-on:closeWin='closeWin'/>
+			<RegisterForm v-on:closeWin='closeWin'/>
 		</el-dialog>
 		<el-form ref="LoginForm" :model="LoginForm" :rules='rules' label-width="70px" label-position='left' class="demo-ruleForm">
             <el-form-item prop="username" size='mini'>
@@ -11,7 +11,10 @@
 			</el-form-item>
             <el-form-item prop="password" size='mini'>
 				<el-col :span="22">
-					<el-input placeholder="请输入密码" v-model="LoginForm.password" show-password></el-input>
+					<el-input :type='this.type' placeholder="请输入密码" v-model="LoginForm.password" @keyup.enter.native="login">
+                        <i slot="suffix" style="cursor:pointer;"
+                     class="el-icon-view" @click="showOrHidePwd"></i>
+                    </el-input>
 				</el-col>
 			</el-form-item>
             <el-row>
@@ -29,7 +32,7 @@
 
 <script>
 	import Bus from '../../bus/bus.js';
-	import registerForm from './registerForm.vue';
+	import RegisterForm from './RegisterForm.vue';
 	import PolicyContainer from '../Policy/PolicyContainer.vue';
 	import ContentRewritePolicy from '../Policy/ContentRewritePolicy/ContentRewritePolicy.vue';
 
@@ -38,6 +41,8 @@
 		data() {
 			return {
                 dialogVisible : false,
+                type : 'password',
+                hideFlag : false,
                 LoginForm : {
                     username : '',
                     password : ''
@@ -49,7 +54,7 @@
 			};
 		},
 		components :{
-            registerForm : registerForm
+            RegisterForm : RegisterForm
 		},
 		methods: {
             register () {
@@ -65,6 +70,8 @@
                         this.$axios.post(api, this.LoginForm)
                             .then((response) => {
                                 if(response.status == 200){
+                                    /* let payload = {name: 'qqq', role: u, token: 'ncbnv'}
+  		                            this.$store.commit(types.USER, payload) */
                                     this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
                                     // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
                                 }else{
@@ -79,6 +86,14 @@
                             });
                     }
                 });
+            },
+            showOrHidePwd () {
+                if(this.hideFlag){
+                    this.type = 'password';
+                }else{
+                    this.type = 'text';
+                }
+                this.hideFlag = !this.hideFlag;
             }
 		},
         mounted () {
