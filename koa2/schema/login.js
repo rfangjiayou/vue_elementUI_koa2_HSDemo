@@ -12,10 +12,10 @@ module.exports = (sequelize, dataTypes) => {
             allowNull : false,
             field : 'password'
         },
-        permission : {
+        role : {
             type : dataTypes.INTEGER,
             allowNull : false,
-            field : 'permission'
+            field : 'role'
         }
     }, {
         freezeTableName : true,      //默认情况下自动将所有传递的模型名称（第一个参数）转换为复数，如果不想这样，这个属性置为true

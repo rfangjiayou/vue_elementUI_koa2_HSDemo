@@ -81,6 +81,30 @@ class controllerLogin {
             };
         }
     }
+
+    static async registerObject (ctx, next) {
+        try {
+            let returnData = await loginModel.getObject();
+            let req = ctx.request.body;
+            let flag = true;
+            returnData.forEach(element => {
+                if(element.username == req.username){
+                    flag = false;
+                }
+            })
+            if(flag){
+                returnData = await loginModel.createObject(req);
+                ctx.body = returnData;
+            }else{
+                ctx.throw(500);
+            }
+        } catch (err) {
+            ctx.response.status = err.statusCode || err.status || 500;
+            ctx.response.body = {
+                message: 'The username is already existed!'
+            };
+        }
+    }
 };
 
 module.exports = controllerLogin;

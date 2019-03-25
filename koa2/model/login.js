@@ -20,6 +20,9 @@ class loginModel {
 
     static async createObject (data) {
         return await login.create({
+            username : data.username,
+            password : data.password,
+            role : data.role
         });
     }
 
