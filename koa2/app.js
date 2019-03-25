@@ -2,7 +2,8 @@ let koa = require('koa'),
 	logger = require('koa-logger'), 
 	json = require('koa-json'), 
 	onerror = require('koa-onerror'), 
-	cors = require('koa-cors');
+	cors = require('koa-cors'),
+	koajwt = require('koa-jwt');
 
 let app = new koa();
 let index = require('./routes/index');
@@ -29,6 +30,13 @@ app.use(require('koa-static')(__dirname + '/public'));
 
 // routes definition
 app.use(index.routes(), index.allowedMethods());
+
+//验证token
+app.use(koajwt({
+    secret: 'rfang'
+}).unless({
+    path: [/\/login\/login/, /\/login\/register/]
+}));
 
 // error-handling
 app.on('error', (err, ctx) => {
