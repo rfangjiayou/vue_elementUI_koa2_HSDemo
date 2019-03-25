@@ -25,16 +25,6 @@ Vue.config.productionTip = false
 
 require('./assets/js/main.js')
 
-/* eslint-disable no-new */
-new Vue({
-    el: '#app',
-    render: h => h(App),
-    router
-    /* components: { App },
-    template: '<App/>' */
-})
-
-
 router.beforeEach((to, from, next) => {
     /* var user = store.state.user;
     if (user && user.token) { // 判断是否有token
@@ -56,3 +46,19 @@ router.beforeEach((to, from, next) => {
     console.log('sss');
     next()
 });
+
+// axios 请求拦截器处理请求数据
+Axios.interceptors.request.use((config) => {
+    let token = localStorage.getItem('token');
+    config.headers.common['Authorization'] = 'Bearer ' + token;
+    return config;
+})
+
+/* eslint-disable no-new */
+new Vue({
+    el: '#app',
+    render: h => h(App),
+    router
+    /* components: { App },
+    template: '<App/>' */
+})
