@@ -1,50 +1,50 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import BaseLayout from '../components/BaseLayout.vue';
-import LoginContainer from '../components/Login/LoginContainer.vue';
-import PolicyContainer from '../components/Policy/PolicyContainer.vue';
-import LogContainer from '../components/Log/LogContainer.vue';
-import SecurityPolicy from '../components/Policy/SecurityPolicy/SecurityPolicy.vue';
-import ContentRewritePolicy from '../components/Policy/ContentRewritePolicy/ContentRewritePolicy.vue';
 
 Vue.use(Router)
  
 export default new Router({
     routes: [
         {
-            path: '*'
+            path: '*',
+            component: { template: '<div>404未找到</div>' }
         },
         {
             path: '/login',
             name: 'login',
-            component: LoginContainer
+            component: resolve => require(['../components/Login/LoginContainer'], resolve)
         },
         {
             path: '/baselayout',
             name: 'baselayout',
-            component: BaseLayout,
+            component: resolve => require(['../components/BaseLayout.vue'], resolve),
             children : [
                 {
                     path: '/policy',
                     name: 'policy', 
-                    component: PolicyContainer,
+                    component: resolve => require(['../components/Policy/PolicyContainer.vue'], resolve),
                     children : [
                         {
                             path: '/policy/securitypolicy',
                             name: 'securitypolicy', 
-                            component: SecurityPolicy
+                            component: resolve => require(['../components/Policy/SecurityPolicy/SecurityPolicy.vue'], resolve)
                         },
                         {
                             path: '/policy/crpolicy',
                             name: 'contentrewritepolicy', 
-                            component: ContentRewritePolicy
+                            component: resolve => require(['../components/Policy/ContentRewritePolicy/ContentRewritePolicy.vue'], resolve)
                         }
                     ]
                 },
                 {
                     path: '/log',
                     name: 'log', 
-                    component: LogContainer
+                    component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
+                },
+                {
+                    path: '/system',
+                    name: 'system', 
+                    component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
                 }
             ]
         },

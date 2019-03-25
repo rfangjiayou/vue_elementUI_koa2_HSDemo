@@ -2,7 +2,7 @@
     <div id='ContentRewritePolicy' >
 		<Tbar v-on:add='openNewOrEditWin' @edit='openNewOrEditWin' @deleteData='deleteData'/>
 		<el-dialog title="内容改写策略配置" :visible.sync="dialogVisible"  v-if="dialogVisible" :close-on-click-modal='false' width="950px">
-			<CRPolicyForm ref='CRPolicyContainer' v-on:closeWin='closeWin' :mode='this.mode'/>
+			<CRPolicyForm v-on:closeWin='closeWin' :mode='this.mode'/>
 		</el-dialog>
         <el-table
 			ref="multipleTable"

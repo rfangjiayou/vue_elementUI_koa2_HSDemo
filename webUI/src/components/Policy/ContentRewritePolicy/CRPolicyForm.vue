@@ -135,27 +135,27 @@
 	import Bus from '../../../bus/bus.js';
 	import CRPolicyMatchTable from './CRPolicyMatchTable.vue';
 
-	var objectOptions = [{value : 1, label : 'URL'}, 
-						{value : 2, label : '头部'}, 
-						{value : 3, label : '响应体'}];
-	var objectNameOptions = [{value : 1, label : 'Host'}, 
-							{value : 2, label : 'Referer'}, 
-							{value : 3, label : 'Location'},
-							{value : 4, label : 'Content-type'}];
-	var objectOperatorOptions = [{value : 1, label : '匹配'}, 
-								{value : 2, label : '不匹配'}, 
-								{value : 3, label : '存在'},
-								{value : 4, label : '不存在'}];
-	var actionOptions = [{value : 1, label : 'URL'}, 
-						{value : 2, label : '头部'}, 
-						{value : 3, label : '响应体'}];
-	var elementNameOptions = [{value : 1, label : 'Host'}, 
-							{value : 2, label : 'Referer'}, 
-							{value : 3, label : 'Location'}];
-
 	export default {
 		props : ['mode'],
 		data() {
+			var objectOptions = [{value : 1, label : 'URL'}, 
+								{value : 2, label : '头部'}, 
+								{value : 3, label : '响应体'}];
+			var objectNameOptions = [{value : 1, label : 'Host'}, 
+									{value : 2, label : 'Referer'}, 
+									{value : 3, label : 'Location'},
+									{value : 4, label : 'Content-type'}];
+			var objectOperatorOptions = [{value : 1, label : '匹配'}, 
+										{value : 2, label : '不匹配'}, 
+										{value : 3, label : '存在'},
+										{value : 4, label : '不存在'}];
+			var actionOptions = [{value : 1, label : 'URL'}, 
+								{value : 2, label : '头部'}, 
+								{value : 3, label : '响应体'}];
+			var elementNameOptions = [{value : 1, label : 'Host'}, 
+									{value : 2, label : 'Referer'}, 
+									{value : 3, label : 'Location'}];
+				
 			return {
 				matchObj : {
 					rdgrpDirection : 1,
