@@ -72,7 +72,8 @@
                                 if(response.status == 200){
                                     /* let payload = {name: 'qqq', role: u, token: 'ncbnv'}
                                       this.$store.commit(types.USER, payload) */
-                                    localStorage.setItem('token', response.data.token);
+                                    sessionStorage.setItem('token', response.data.token);
+                                    sessionStorage.setItem('role', response.data.data.role);
                                     this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
                                     // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
                                 }else{

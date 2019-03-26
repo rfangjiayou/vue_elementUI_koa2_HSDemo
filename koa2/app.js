@@ -14,6 +14,13 @@ let response = require('./middleware/response');
 app.use(response);
 //=========================================================================
 
+//验证token,放在路由注册之前
+app.use(koajwt({
+    secret: 'rfang'
+}).unless({
+    path: [/\/login\/login/, /\/login\/register/]
+}));
+
 // error handler
 onerror(app);
 
@@ -30,13 +37,6 @@ app.use(require('koa-static')(__dirname + '/public'));
 
 // routes definition
 app.use(index.routes(), index.allowedMethods());
-
-//验证token
-app.use(koajwt({
-    secret: 'rfang'
-}).unless({
-    path: [/\/login\/login/, /\/login\/register/]
-}));
 
 // error-handling
 app.on('error', (err, ctx) => {
