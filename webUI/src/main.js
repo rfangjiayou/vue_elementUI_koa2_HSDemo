@@ -25,31 +25,9 @@ Vue.config.productionTip = false
 
 require('./assets/js/main.js')
 
-router.beforeEach((to, from, next) => {
-    /* var user = store.state.user;
-    if (user && user.token) { // 判断是否有token
-      if (to.meta.roles && to.meta.roles.indexOf(user.role) === -1) {//页面有权限要求但用户不符合
-          alert('403')
-          if(from.path == '/login'){
-              next('/')
-          }else{
-              next({path: from.path})
-          }
-      } else {//页面没有权限要求就直接访问
-          next()
-      }
-    } else if(to.path != '/login'){//没有token的话让跳转到登录页，并传递当前准备访问的路由
-        next({path:'/login', query: {redirect: to.fullPath}})
-    } else{
-        next()
-    } */
-    console.log('sss');
-    next()
-});
-
 // axios 请求拦截器处理请求数据
 Axios.interceptors.request.use((config) => {
-    let token = localStorage.getItem('token');
+    let token = sessionStorage.getItem('token');
     config.headers.common['Authorization'] = 'Bearer ' + token;
     return config;
 })

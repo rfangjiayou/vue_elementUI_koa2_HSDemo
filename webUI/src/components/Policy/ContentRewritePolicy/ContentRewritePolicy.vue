@@ -116,6 +116,13 @@
                     }
                 })
                 .catch((error) => {
+					if(error.response.status == 401){
+						this.$router.push({path : '/'});
+						this.$message = {
+							type: 'error',
+                    		message: '用户认证失败!'
+						}
+					}
                     console.log(error);
                 });
             },
