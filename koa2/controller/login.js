@@ -1,5 +1,5 @@
 let loginModel = require('../model/login');
-let jwt = require('jsonwebtoken');
+let token = require('../token/token');
 
 class controllerLogin {
 
@@ -20,13 +20,10 @@ class controllerLogin {
             let req = ctx.request.body;
             let returnData = await loginModel.getSimpleObject(req);
             if(returnData){
-                let token = jwt.sign({
-                    username: returnData.username,
-                    password: returnData.password
-                }, 'rfang', { expiresIn: '1h' });
+                let _token = token(returnData);
                 ctx.body = {
                     data : returnData,
-                    token : token
+                    token : _token
                 };
             }else{
                 ctx.status = 204;
