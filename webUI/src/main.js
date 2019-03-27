@@ -7,11 +7,13 @@ import 'element-ui/lib/theme-chalk/index.css';
 
 import App from './App';
 
-import router from './router';
+import router from './router/index.js';
 import VueRouter from 'vue-router';
 
 import Axios from 'axios';
 import qs  from 'qs';
+
+import store from './vuex/store.js';
 
 Vue.use(ElementUI);
 Vue.use(VueRouter);
@@ -36,7 +38,8 @@ Axios.interceptors.request.use((config) => {
 new Vue({
     el: '#app',
     render: h => h(App),
-    router
+    router,
+    store
     /* components: { App },
     template: '<App/>' */
 })
