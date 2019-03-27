@@ -35,6 +35,7 @@
 	import RegisterForm from './RegisterForm.vue';
 	import PolicyContainer from '../Policy/PolicyContainer.vue';
 	import ContentRewritePolicy from '../Policy/ContentRewritePolicy/ContentRewritePolicy.vue';
+	import LogContainer from '../Log/LogContainer.vue';
 
 	export default {
 		props : [],
@@ -70,12 +71,16 @@
                         this.$axios.post(api, this.LoginForm)
                             .then((response) => {
                                 if(response.status == 200){
-                                    /* let payload = {name: 'qqq', role: u, token: 'ncbnv'}
-                                      this.$store.commit(types.USER, payload) */
-                                    sessionStorage.setItem('token', response.data.token);
-                                    sessionStorage.setItem('role', response.data.data.role);
-                                    this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
-                                    // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
+                                    this.$store.commit('setToken', response.data.token);
+                                    this.$store.commit('setRole', response.data.data.role);
+                                    this.$store.dispatch('setRoutes', response.data);
+                                    // this.$store.commit('setUserRoutes', response.data);
+                                    if(response.data.data.role != 2){
+                                        this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
+                                         // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
+                                    }else{
+                                        this.$router.push({path : '/log', name : 'log', component: LogContainer});
+                                    }
                                 }else{
                                     this.$message({
                                         type: 'error',
