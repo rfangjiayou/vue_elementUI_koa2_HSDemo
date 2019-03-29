@@ -127,6 +127,6 @@
 		border-bottom:1px solid #d0d0d0;
 		text-align: left;
 		background-color:white;
-		padding: 7px;
+		padding: 10px;
 	}
 </style>

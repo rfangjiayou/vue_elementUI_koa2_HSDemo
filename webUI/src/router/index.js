@@ -66,7 +66,17 @@ export const dynamicRoutes = [
                     roles: [1,2],
                     title : '日志'
                 },
-                component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
+                component: resolve => require(['../components/Log/LogContainer.vue'], resolve),
+                children : [
+                    {
+                        path: '/log/systemlog',
+                        name: 'systemlog',
+                        meta: {
+                            roles: [1,2]
+                        },
+                        component: resolve => require(['../components/Log/SystemLog.vue'], resolve)
+                    }
+                ]
             },
             {
                 path: '/system',
