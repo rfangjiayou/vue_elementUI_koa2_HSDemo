@@ -9,8 +9,8 @@
         text-color="#fff"
         active-text-color="#ffd04b"
         router>
-            <el-menu-item v-for="(item,i) in itemList" :key="i" :index="item.name">
-            {{ item.item }}
+            <el-menu-item v-for="(item,i) in this.$store.state.userRoutes[0].children" :key="i" :index="item.path">
+            {{ item.meta.title }}
             </el-menu-item>
         </el-menu>
         <el-button 
@@ -28,11 +28,6 @@
     export default {
         data() {
             return {
-                itemList:[
-                    {name:'/policy',item:'策略'},
-                    {name:'/log', item:'日志'},
-                    {name:'/system', item:'系统'}
-                ]
             };
         },
         methods: {
@@ -45,7 +40,8 @@
                 })
                 .then((action) => {
                     if(action == 'confirm'){
-                        this.$router.push({path : '/login', name : 'login', component: LoginContainer});
+                        //注销的时候要刷新页面，清除路由信息
+                        window.location.reload();
                     }
                 })
                 .catch(() => {

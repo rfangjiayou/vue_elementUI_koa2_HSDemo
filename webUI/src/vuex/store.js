@@ -2,90 +2,37 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import router from '../router/index.js'
 
+import { dynamicRoutes } from '../router/index.js';
+
 Vue.use(Vuex)
 
-/*
-*   路由信息，不包括login，修改路由在这里修改即可
-*   权限管理 ： 1 系统管理员  2 系统审计员  3 系统游客
-*/
-let dynamicRoutes = [
-    {
-        path: '/',
-        redirect:'/login'
-    },
-    {
-        path: '/baselayout',
-        name: 'baselayout',
-        component: resolve => require(['../components/BaseLayout.vue'], resolve),
-        children : [
-            {
-                path: '/policy',
-                name: 'policy', 
-                component: resolve => require(['../components/Policy/PolicyContainer.vue'], resolve),
-                // component: () => import('../components/Policy/PolicyContainer.vue'),
-                meta: {
-                    roles: [1,3]
-                },
-                children : [
-                    {
-                        path: '/policy/securitypolicy',
-                        name: 'securitypolicy', 
-                        meta: {
-                            roles: [1,3]
-                        },
-                        component: resolve => require(['../components/Policy/SecurityPolicy/SecurityPolicy.vue'], resolve)
-                    },
-                    {
-                        path: '/policy/crpolicy',
-                        name: 'contentrewritepolicy',
-                        meta: {
-                            roles: [1,3]
-                        },
-                        component: resolve => require(['../components/Policy/ContentRewritePolicy/ContentRewritePolicy.vue'], resolve)
+//过滤路由，目前只支持2层
+const accessedRouters = () => {
+    dynamicRoutes.filter(v => {
+        if (v.meta && v.meta.roles.indexOf(parseInt(store.state.role)) !== -1) {
+            if (v.children && v.children.length > 0) {
+                v.children = v.children.filter(child => {
+                    if (child.meta.roles.indexOf(parseInt(store.state.role)) !== -1) {
+                        if(child.children && child.children.length > 0){
+                            child.children = child.children.filter(value => {
+                                if (value.meta.roles.indexOf(parseInt(store.state.role)) !== -1) {
+                                    return value;
+                                }
+                            })
+                        }
+                        return child;
                     }
-                ]
-            },
-            {
-                path: '/log',
-                name: 'log',
-                meta: {
-                    roles: [1,2]
-                },
-                component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
-            },
-            {
-                path: '/system',
-                name: 'system',
-                meta: {
-                    roles: [1,2]
-                },
-                component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
+                        return false;
+                    });
+                return v
+            } else {
+                return v
             }
-        ]
-    }, {
-        path: '*',
-        component: { template: '<div>404未找到</div>' }
-    }
-];
-
-let checkChildren = (routes, userInfo) => {
-    var tmpRouters = JSON.parse(JSON.stringify(routes));
-    for(let i = 0; i < tmpRouters.length; i++){
-        let element = tmpRouters[i];
-        if(element.children){
-            routes[i].children = checkChildren(element.children, userInfo);
-        }else{
-            routes = routes.filter((value) => {
-                if(value.meta){
-                    return value.meta.roles.indexOf(userInfo.data.role) !== -1;
-                }else{
-                    return true;
-                }
-            })
         }
-    }
-    return routes;
-};
+        return false;
+    });
+    return dynamicRoutes;
+}
 
 let store = new Vuex.Store({
     // 定义状态
@@ -113,14 +60,17 @@ let store = new Vuex.Store({
         },
         setUserRoutes (state, userInfo) {
             // 生成用户路由表
-            state.userRoutes = checkChildren(dynamicRoutes, userInfo);
+            state.userRoutes = accessedRouters();
             // 注册路由
-            router.addRoutes(state.userRoutes); 
+            router.addRoutes(state.userRoutes);
         }
     },
-    actions: {
-        async setRoutes (ctx, data) {
-            ctx.commit('setUserRoutes', data);
+    actions : {
+        setRoutes (ctx, data) {
+            return new Promise(resolve => {
+                ctx.commit('setUserRoutes', data);
+                resolve();
+            })
         }
     }
 })
