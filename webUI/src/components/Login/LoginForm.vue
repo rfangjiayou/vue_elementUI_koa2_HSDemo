@@ -73,14 +73,14 @@
                                 if(response.status == 200){
                                     this.$store.commit('setToken', response.data.token);
                                     this.$store.commit('setRole', response.data.data.role);
-                                    this.$store.dispatch('setRoutes', response.data);
-                                    // this.$store.commit('setUserRoutes', response.data);
-                                    if(response.data.data.role != 2){
-                                        this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
-                                         // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
-                                    }else{
-                                        this.$router.push({path : '/log', name : 'log', component: LogContainer});
-                                    }
+                                    this.$store.dispatch('setRoutes', response.data).then(res => {
+                                        if(response.data.data.role != 2){
+                                            this.$router.push({path : '/policy', name : 'policy', component: PolicyContainer});
+                                            // this.$router.push({path : '/policy/crpolicy', name : 'contentrewritepolicy', component: ContentRewritePolicy});
+                                        }else{
+                                            this.$router.push({path : '/log', name : 'log', component: LogContainer});
+                                        }
+                                    });
                                 }else{
                                     this.$message({
                                         type: 'error',

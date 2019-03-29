@@ -27,6 +27,16 @@ Vue.config.productionTip = false
 
 require('./assets/js/main.js')
 
+//全局路由守卫
+router.beforeEach((to, from, next) => {
+    var token = sessionStorage.getItem('token');
+    if (token) { // 判断是否有token
+        next()
+    } else if(to.path != '/login'){//没有token的话让跳转到登录页，并传递当前准备访问的路由
+        next({path:'/'});
+    }
+});
+
 // axios 请求拦截器处理请求数据
 Axios.interceptors.request.use((config) => {
     let token = sessionStorage.getItem('token');
