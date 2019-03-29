@@ -9,7 +9,7 @@
             router>
             <el-submenu index="/" style='text-align: left;'>
                 <template slot="title">
-                    <i class="el-icon-location"></i>
+                    <i class="el-icon-menu"></i>
                     <span>策略类型</span>
                 </template>
                 <el-menu-item @click="handleChange" index="/policy/securitypolicy">安全策略</el-menu-item>
@@ -17,7 +17,7 @@
             </el-submenu>
             <el-submenu index="/policy/protectionrules" style='text-align: left;'>
                     <template slot="title">
-                        <i class="el-icon-menu"></i>
+                        <i class="el-icon-location"></i>
                         <span slot="title">防护规则</span>
                     </template>
                     <el-menu-item index="/policy/protectionrules/predefinedrules">预定义规则</el-menu-item>

@@ -9,14 +9,10 @@
             router>
             <el-submenu index="/log" style='text-align: left;'>
                 <template slot="title">
-                    <i class="el-icon-menu"></i>
+                    <i class="el-icon-document"></i>
                     <span slot="title">日志</span>
                 </template>
-                <el-submenu index="/policy/protectionrules">
-                    <template slot="title">防护规则</template>
-                    <el-menu-item index="/policy/protectionrules/predefinedrules">预定义规则</el-menu-item>
-                    <el-menu-item index="/policy/protectionrules/customrules">自定义规则</el-menu-item>
-                </el-submenu>
+                <el-menu-item @click="handleChange" index="/log/systemlog">系统日志</el-menu-item>
             </el-submenu>
             </el-menu>
         </el-col>
@@ -24,16 +20,19 @@
 </template>
 
 <script>
-    export default {
-        methods: {
-            handleChange(index, indexPath) {
-            },
-            handleOpen(key, keyPath) {
-            },
-            handleClose(key, keyPath) {
-            }
+import Bus from '../../bus/bus.js';
+
+export default {
+    methods: {
+        handleChange(index, indexPath) {
+            Bus.$emit('loadsystemlog');
+        },
+        handleOpen(key, keyPath) {
+        },
+        handleClose(key, keyPath) {
         }
     }
+}
 </script>
 
 <style scoped>
