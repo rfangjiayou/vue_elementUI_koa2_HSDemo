@@ -1,6 +1,6 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue';
+import Vue from 'vue'
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -34,6 +34,8 @@ router.beforeEach((to, from, next) => {
         next()
     } else if(to.path != '/login'){//没有token的话让跳转到登录页，并传递当前准备访问的路由
         next({path:'/'});
+    }else {
+        next()
     }
 });
 
@@ -47,9 +49,9 @@ Axios.interceptors.request.use((config) => {
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
-    render: h => h(App),
     router,
-    store
+    store,
+    render: h => h(App)
     /* components: { App },
     template: '<App/>' */
 })
