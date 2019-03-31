@@ -36,6 +36,8 @@ export default {
 </script>
 
 <style>
-
+	.el-main {
+		overflow: hidden;
+	}
 </style>
 

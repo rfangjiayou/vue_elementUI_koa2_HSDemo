@@ -2,7 +2,7 @@
     <div class="SyslogContainer">
         <el-row>
             <el-button type="primary" @click="exportLog" size='mini' plain icon="el-icon-download">导出日志</el-button>
-            <el-button type="info" @click="resetDateFilter" size='mini' plain>清除日期过滤器</el-button>
+            <el-button type="info" @click="clearDateFilter" size='mini' plain>清除日期过滤器</el-button>
             <el-form :rule='rules' ref='CreateLogForm' :model='CreateLogForm'>
                 <el-form-item prop="total">
                     <el-input placeholder="请输入生成数据的总数" v-model="CreateLogForm.total" size='mini' class="input-with-select">
@@ -11,14 +11,14 @@
                 </el-form-item>
             </el-form>
         </el-row>
-        <el-table ref="systemlog" :data="tableData" size='mini' stripe>
+        <el-table ref="systemlog" id="systemlog-table" :data="tableData" size='mini' height="100%" stripe>
             <el-table-column
                 prop="date"
                 label="日期"
                 sortable
                 width="180"
                 column-key="date"
-                :filters="[{text: '2016-05-01', value: '2016-05-01'}, {text: '2016-05-02', value: '2016-05-02'}, {text: '2016-05-03', value: '2016-05-03'}, {text: '2016-05-04', value: '2016-05-04'}]"
+                :filters="[{text: '最近一小时', value: '3600000'}, {text: '最近一天', value: '86400000'}, {text: '最近一周', value: '7 * 86400000'}, {text: '最近一月', value: '30 * 86400000'}]"
                 :filter-method="filterHandler"
                 :formatter='renderDatetime'
             >
@@ -29,7 +29,8 @@
             </el-table-column>
             <el-table-column
                 prop="severity"
-                label="级别">
+                label="级别"
+                :formatter='renderSeverity'>
             </el-table-column>
             <el-table-column
                 prop="client_ip"
@@ -44,6 +45,10 @@
 </template>
 
 <script>
+ // 引入导出Excel表格依赖
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
+
 import Bus from '../../bus/bus.js';
 
 export default {
@@ -73,23 +78,85 @@ export default {
     },
     methods : {
         exportLog () {
-
+            this.$confirm('是否导出全部日志？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                closeOnClickModal : false,
+                type: 'warning'
+            })
+            .then((action) => {
+                if(action == 'confirm'){
+                    /* 从表生成工作簿对象 */
+                    let wb = XLSX.utils.table_to_book(document.querySelector("#systemlog-table"));
+                    /* 获取二进制字符串作为输出 */
+                    let wbout = XLSX.write(wb, {
+                        bookType: "xlsx",
+                        bookSST: true,
+                        type: "array"
+                    });
+                    try {
+                        FileSaver.saveAs(
+                        //Blob 对象表示一个不可变、原始数据的类文件对象。
+                        //Blob 表示的不一定是JavaScript原生格式的数据。
+                        //File 接口基于Blob，继承了 blob 的功能并将其扩展使其支持用户系统上的文件。
+                        //返回一个新创建的 Blob 对象，其内容由参数中给定的数组串联组成。
+                        new Blob([wbout], { type: "application/octet-stream" }),
+                        //设置导出文件名称
+                        "log.xlsx"
+                        );
+                    } catch (e) {
+                        if (typeof console !== "undefined") console.log(e, wbout);
+                    }
+                    return wbout;
+                }
+            })
+            .catch(() => {
+                /* this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });  */         
+            });
         },
-        filterHandler () {
-
+        filterHandler (value, row) {
+            let dateTime = new Date(row.time).getTime(),
+                current = new Date().getTime()
+            return dateTime > current - value;
         },
-        resetDateFilter () {
-
+        clearDateFilter () {
+            this.$refs.systemlog.clearFilter('date');
         },
         renderDatetime (row, column, cellValue, index) {
-            let time = new Date(parseInt(row.time)),
-                year = time.getFullYear(),
-                month = time.getMonth() + 1 < 10 ? '0' + (time.getMonth() + 1) : time.getMonth() + 1,
-                day = time.getDate() < 10 ? ('0' + time.getDate()) : time.getDate(),
-                hour = time.getHours() < 10 ? ('0' + time.getHours()) : time.getHours(),
-                minute = time.getMinutes() < 10 ? ('0' + time.getMinutes()) : time.getMinutes(),
-                second = time.getSeconds() < 10 ? ('0' + time.getSeconds()) : time.getSeconds();
-            return year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+            let dateTime = this.getLocalTime(+8, row.time),
+                year = dateTime.getFullYear(),
+                month = dateTime.getMonth() + 1 < 10 ? '0' + (dateTime.getMonth() + 1) : dateTime.getMonth() + 1,
+                day = dateTime.getDate() < 10 ? ('0' + dateTime.getDate()) : dateTime.getDate(),
+                hour = dateTime.getHours() < 10 ? ('0' + dateTime.getHours()) : dateTime.getHours(),
+                minute = dateTime.getMinutes() < 10 ? ('0' + dateTime.getMinutes()) : dateTime.getMinutes(),
+                second = dateTime.getSeconds() < 10 ? ('0' + dateTime.getSeconds()) : dateTime.getSeconds();
+            
+            let data = [], time = [];
+            data.push(year);
+            data.push(month);
+            data.push(day);
+            time.push(hour);
+            time.push(minute);
+            time.push(second);
+            // dataTime.push(date.split('T')[0]);
+            // dataTime.push(date.split('T')[1].split('.')[0]);
+            return data.join('-') + ' ' + time.join(':');
+        },
+        renderSeverity (row, column, cellValue, index) {
+            let value = '';
+            if(row.severity == 0){
+                value = '低';
+            }else if(row.severity == 1){
+                value = '中';
+            }else if(row.severity == 2){
+                value = '高';
+            }else if(row.severity == 3){
+                value = '严重';
+            }
+            return value;
         },
         loadSystemLog () {
             var url = '/api/systemlog/getObject';
@@ -99,12 +166,14 @@ export default {
                 Bus.$emit('unmask');
                 if(response.status == 200){
                     this.tableData = response.data;
+                    this.CreateLogForm.total = '';
                 }
             })
             .catch((error) => {
                 Bus.$emit('unmask');
+                this.CreateLogForm.total = '';
                 if(error.response.status == 401){
-                    this.$router.push({path : '/'});
+                    window.location.reload();
                     this.$message = {
                         type: 'error',
                         message: '用户认证失败!'
@@ -130,6 +199,12 @@ export default {
                                 .then((response) => {
                                     Bus.$emit('unmask');
                                     this.loadSystemLog();
+                                    this.$notify({
+                                        title: '成功',
+                                        message: '测试数据生成成功',
+                                        type: 'success',
+                                        offset: 100 
+                                    });
                                 })
                                 .catch((error) => {
                                     Bus.$emit('unmask');
@@ -145,6 +220,16 @@ export default {
                     });
                 }
             });
+        },
+        getLocalTime (i, d) {
+            //参数i为时区值数字，比如北京为东八区则输入+8,西5输入-5
+            //参数d为要转换的时间
+            var len = new Date(d).getTime();
+            //本地时间与GMT时间的时间偏移差
+            var offset = new Date(d).getTimezoneOffset() * 60000;
+            //得到现在的格林尼治时间
+            var utcTime = len + offset;
+            return new Date(utcTime + 3600000 * i);
         }
     },
     mounted () {
@@ -160,6 +245,9 @@ export default {
 </script>
 
 <style scoped>
+    .SyslogContainer {
+		height: 100%;
+	}
     .el-row {
         text-align: left;
 		padding: 10px;
