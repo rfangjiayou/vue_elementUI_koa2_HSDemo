@@ -26,7 +26,11 @@ let writeSyslog = (total) => {
 
 class syslogModel {
     static async getObject () {
-        return await syslog.findAll();
+        return await syslog.findAll({
+            'order': [
+                ['time', 'DESC']
+            ]
+        });
     }
 
     static async createObject (data) {
