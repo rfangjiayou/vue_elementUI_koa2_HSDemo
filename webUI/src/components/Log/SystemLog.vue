@@ -11,7 +11,7 @@
                 </el-form-item>
             </el-form>
         </el-row>
-        <el-table ref="systemlog" id="systemlog-table" :data="tableData" size='mini' height="100%" stripe>
+        <el-table ref="systemlog" id="systemlog-table" :data="tableData" size='mini' height="91%" stripe>
             <el-table-column
                 prop="date"
                 label="日期"
@@ -41,6 +41,9 @@
                 label="攻击次数">
             </el-table-column>
         </el-table>
+        <el-footer>
+			<PageBar :total='this.total'/>
+		</el-footer>
     </div>
 </template>
 
@@ -50,6 +53,7 @@ import FileSaver from "file-saver";
 import XLSX from "xlsx";
 
 import Bus from '../../bus/bus.js';
+import PageBar from '../PageBar.vue';
 
 export default {
     data () {
@@ -64,6 +68,9 @@ export default {
             CreateLogForm:{
                 total : ''
             },
+            total : '',
+            limit : '',
+            offset : '',
             tableData : [{
                 date : '',
                 severity : '',
@@ -75,6 +82,9 @@ export default {
                 total : [{validator: validatePass, trigger: 'blur'}]
             }
 		}
+    },
+    components : {
+        'PageBar' : PageBar
     },
     methods : {
         exportLog () {
@@ -161,12 +171,17 @@ export default {
         loadSystemLog () {
             var url = '/api/systemlog/getObject';
             Bus.$emit('mask');
-            this.$axios.get(url)
+            this.$axios.get(url, {
+                params : {
+                    limit : this.limit == '' ? 50 : this.limit,         // 每页多少条
+                    offset : this.offset == '' ? 0 : this.offset           // 跳过多少条
+                }
+            })
             .then((response) => {
                 Bus.$emit('unmask');
                 if(response.status == 200){
-                    this.tableData = response.data;
-                    this.CreateLogForm.total = '';
+                    this.tableData = response.data.result;
+                    this.total = response.data.total;
                 }
             })
             .catch((error) => {
@@ -236,10 +251,26 @@ export default {
         Bus.$on('loadsystemlog', () => {
             this.loadSystemLog();
         });
+        Bus.$on('sizeChange', (value) => {
+            if(value.length > 0){
+                this.offset = value[1] * (value[0] - 1);
+                this.limit = value[1];
+            }
+            this.loadSystemLog();
+        });
+        Bus.$on('currentPageChange', (value) => {
+            if(value.length > 0){
+                this.offset = value[1] * (value[0] - 1);
+                this.limit = value[1];
+            }
+            this.loadSystemLog();
+        });
         this.loadSystemLog();
     },
     beforeDestroy () {
         Bus.$off('loadsystemlog');
+        Bus.$off('sizeChange');
+        Bus.$off('currentPageChange');
     }
 }
 </script>

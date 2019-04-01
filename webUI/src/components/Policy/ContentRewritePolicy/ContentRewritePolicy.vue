@@ -61,6 +61,8 @@
 				delBtn : true,
 				dialogVisible: false,
 				total : '',
+				limit : '',
+				offset : '',
 				mode : '',
 				selection : [],
 				tableData : []
@@ -105,12 +107,16 @@
 			loadCRPolicy () {
 				var url = '/api/policy/getObject';
 				Bus.$emit('mask');
-                this.$axios.get(url)
+                this.$axios.get(url, {
+					params : {
+						limit : this.limit == '' ? 50 : this.limit,         // 每页多少条
+						offset : this.offset == '' ? 0 : this.offset           // 跳过多少条
+					}
+				})
                 .then((response) => {
                     if(response.status == 200){
-						var returnData = response.data;
-						this.total = returnData.length;
-						this.renderData(returnData);
+						this.tableData = response.data.result;
+                    	this.total = response.data.total;
 						Bus.$emit('btnChange', [true, true]);
 						Bus.$emit('unmask');
                     }
@@ -162,9 +168,6 @@
 				}
 				Bus.$emit('btnChange', [this.editBtn, this.delBtn]);
 			},
-			renderData (value) {
-				this.tableData = value;
-			},
 			renderDirection (row, column, cellValue, index) {
 				if(cellValue == 1){
 					cellValue = '请求';
@@ -193,26 +196,30 @@
 					this.fill(value[0], value[1]);
 				}
 			});
+			Bus.$on('sizeChange', (value) => {
+				if(value.length > 0){
+					this.offset = value[1] * (value[0] - 1);
+					this.limit = value[1];
+				}
+				this.loadCRPolicy();
+			});
+			Bus.$on('currentPageChange', (value) => {
+				if(value.length > 0){
+					this.offset = value[1] * (value[0] - 1);
+					this.limit = value[1];
+				}
+				this.loadCRPolicy();
+			});
 			Bus.$emit('CRPolicyMounted');
 		},
 		beforeDestroy () {
 			Bus.$off('loadCRPolicy');
 			Bus.$off('fillCRForm');
+			Bus.$off('sizeChange');
+        	Bus.$off('currentPageChange');
 		}
   	}
 </script>
 
 <style scoped>
-	.el-footer {
-		position : absolute;
-		left : 200px;
-		right : 0px;
-		bottom : 0px;
-		background-color:white;
-		color: #333;
-		text-align: right;
-		border-top:1px solid #d0d0d0;
-		border-left:1px solid #d0d0d0;
-		border-right:1px solid #d0d0d0;
-	}
 </style>

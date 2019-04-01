@@ -40,18 +40,17 @@ export default {
         line-height: 40px;
     }
 
-	/* .el-form-item--mini .el-form-item__content, .el-form-item--mini .el-form-item__label {
-		line-height: 15px;
-	}
-
-	label {
-		position: relative;
-    	top: 7px;
-	} */
-
-	/* body > .el-container {
-		margin-bottom: 40px;
-	} */
-
+	.el-footer {
+		height : 35px !important;
+		background: white;
+        position: absolute;
+        bottom: 0px;
+        right : 0px;
+        left : 200px;
+        text-align: right;
+        border-top:1px solid #d0d0d0;
+		border-left:1px solid #d0d0d0;
+		border-right:1px solid #d0d0d0;
+    }
 </style>
 
