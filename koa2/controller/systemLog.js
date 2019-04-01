@@ -4,8 +4,12 @@ class controllerSyslog {
 
     static async getObject (ctx, next) {
         try {
-            let returnData = await syslogModel.getObject();
-            ctx.body = returnData;
+            let query = ctx.query;
+            let returnData = await syslogModel.getObjectByLimit(query);
+            ctx.body = {
+                result : returnData.rows,
+                total : returnData.count
+            };
         } catch (err) {
             ctx.response.status = err.statusCode || err.status || 500;
             ctx.response.body = {

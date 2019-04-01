@@ -4,8 +4,12 @@ class controllerPolicy {
 
     static async getObject (ctx, next) {
         try {
-            let returnData = await policyModel.getObject();
-            ctx.body = returnData;
+            let query = ctx.query;
+            let returnData = await policyModel.getObjectByLimit(query);
+            ctx.body = {
+                result : returnData.rows,
+                total : returnData.count
+            };
         } catch (err) {
             ctx.response.status = err.statusCode || err.status || 500;
             ctx.response.body = {

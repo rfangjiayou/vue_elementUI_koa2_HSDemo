@@ -33,6 +33,18 @@ class syslogModel {
         });
     }
 
+    static async getObjectByLimit (query) {
+        let limit = parseInt(query.limit),
+            offset = parseInt(query.offset);
+        return await syslog.findAndCountAll({
+            limit: limit,
+            offset: offset,
+            order: [
+                ['time', 'DESC']
+            ]
+        });
+    }
+
     static async createObject (data) {
         return await writeSyslog(data.total);
     }

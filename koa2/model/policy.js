@@ -9,6 +9,15 @@ class policyModel {
         return await policy.findAll();
     }
 
+    static async getObjectByLimit (query) {
+        let limit = parseInt(query.limit),
+            offset = parseInt(query.offset);
+        return await policy.findAndCountAll({
+            limit: limit,
+            offset: offset
+        });
+    }
+
     static async createObject (data) {
         return await policy.create({
             name : data.name,
