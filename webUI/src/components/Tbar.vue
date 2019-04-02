@@ -6,6 +6,7 @@
                 size="mini" 
                 icon="el-icon-plus" 
                 plain
+                :disabled='addBtn'
                 @click='add'>新建
             </el-button>
 			<el-button 
@@ -34,6 +35,7 @@
   	export default {
 		data() {
 			return {
+                addBtn : window.sessionStorage.role == 1 ? false : true,
                 editBtn : true,
 				delBtn : true
             }
@@ -46,7 +48,7 @@
                 this.$emit('edit', 'edit');
             },
             deleteData () {
-                this.$confirm('此操作将永久删除条记录, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除这些记录, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     closeOnClickModal : false,

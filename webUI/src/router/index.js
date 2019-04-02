@@ -56,6 +56,14 @@ export const dynamicRoutes = [
                             roles: [1,3]
                         },
                         component: resolve => require(['../components/Policy/ContentRewritePolicy/ContentRewritePolicy.vue'], resolve)
+                    },
+                    {
+                        path: '/policy/rulesstatistics',
+                        name: 'rulesstatistics',
+                        meta: {
+                            roles: [1,3]
+                        },
+                        component: resolve => require(['../components/Policy/Rules/RulesStatistics.vue'], resolve)
                     }
                 ]
             },
@@ -82,10 +90,20 @@ export const dynamicRoutes = [
                 path: '/system',
                 name: 'system',
                 meta: {
-                    roles: [1,2],
+                    roles: [1,3],
                     title : '系统'
                 },
-                component: resolve => require(['../components/Log/LogContainer.vue'], resolve)
+                component: resolve => require(['../components/Admin/AdminContainer.vue'], resolve),
+                children : [
+                    {
+                        path: '/system/user',
+                        name: 'user',
+                        meta: {
+                            roles: [1,3]
+                        },
+                        component: resolve => require(['../components/Admin/AdminUser.vue'], resolve)
+                    }
+                ]
             }
         ]
     }, {
