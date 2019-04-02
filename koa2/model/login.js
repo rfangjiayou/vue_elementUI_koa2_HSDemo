@@ -5,7 +5,16 @@ let login = db.import('../schema/login');
 // login.sync({force : false});
 
 class loginModel {
-    static async getObject () {
+    static async getObject (query) {
+        let limit = parseInt(query.limit),
+            offset = parseInt(query.offset);
+        return await login.findAndCountAll({
+            limit: limit,
+            offset: offset
+        });
+    }
+
+    static async getAllObject () {
         return await login.findAll();
     }
 
@@ -28,9 +37,12 @@ class loginModel {
 
     static async updateObject (data) {
         return await login.update({
+            username : data.username,
+            password : data.password,
+            role : data.role
         }, {
             where : {
-                id : data.id
+                username : data.username
             }
         });
     }
@@ -38,7 +50,7 @@ class loginModel {
     static async deleteObject (data) {
         return await login.destroy({
             where : {
-                id : data
+                username : data
             }
         });
     }
