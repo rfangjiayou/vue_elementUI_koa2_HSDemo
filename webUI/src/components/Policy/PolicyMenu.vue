@@ -15,13 +15,12 @@
                 <el-menu-item @click="handleChange" index="/policy/securitypolicy">安全策略</el-menu-item>
                 <el-menu-item @click="handleChange" index="/policy/crpolicy">内容改写策略</el-menu-item>
             </el-submenu>
-            <el-submenu index="/policy/protectionrules" style='text-align: left;'>
+            <el-submenu index="/rule" style='text-align: left;'>
                     <template slot="title">
                         <i class="el-icon-location"></i>
                         <span slot="title">防护规则</span>
                     </template>
-                    <el-menu-item index="/policy/protectionrules/predefinedrules">预定义规则</el-menu-item>
-                    <el-menu-item index="/policy/protectionrules/customrules">自定义规则</el-menu-item>
+                    <el-menu-item index="/policy/rulesstatistics">规则统计</el-menu-item>
             </el-submenu>
             </el-menu>
         </el-col>

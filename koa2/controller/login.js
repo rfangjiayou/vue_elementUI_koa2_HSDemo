@@ -5,8 +5,12 @@ class controllerLogin {
 
     static async getObject (ctx, next) {
         try {
-            let returnData = await loginModel.getObject();
-            ctx.body = returnData;
+            let query = ctx.query;
+            let returnData = await loginModel.getObject(query);
+            ctx.body = {
+                result : returnData.rows,
+                total : returnData.count
+            };
         } catch (err) {
             ctx.response.status = err.statusCode || err.status || 500;
             ctx.response.body = {
@@ -52,7 +56,7 @@ class controllerLogin {
     static async updateObject (ctx, next) {
         try {
             let req = ctx.request.body;
-            if(req.id){
+            if(req.username){
                 let returnData = await loginModel.updateObject(req);
                 ctx.body = returnData;
             }else{
@@ -71,7 +75,7 @@ class controllerLogin {
             let req = ctx.request.body;
             let params = [];
             req.forEach(element => {
-                params.push(element.id);
+                params.push(element.username);
             });
             if(params.length > 0){
                 let returnData = await loginModel.deleteObject(params);
@@ -89,7 +93,7 @@ class controllerLogin {
 
     static async registerObject (ctx, next) {
         try {
-            let returnData = await loginModel.getObject();
+            let returnData = await loginModel.getAllObject();
             let req = ctx.request.body;
             let flag = true;
             returnData.forEach(element => {
