@@ -1,124 +1,148 @@
 <template>
     <div id="RulesStatistics">
-        <el-carousel trigger="click" :autoplay='this.autoplay'  height="500px">
-            <el-carousel-item v-for="item in chartList" :key="item">
-                <div v-html='item'></div>
-            </el-carousel-item>
-        </el-carousel>
-        <XChart id="attackType" :option="attackTypeOption" v-if='this.showChart'/>
+        <el-row class='btn'>
+            <el-button type="primary" @click="expandAll" size='mini' plain icon="el-icon-circle-plus-outline">展开所有</el-button>
+            <el-button type="primary" @click="closeAll" size='mini' plain icon="el-icon-remove-outline">关闭所有</el-button>
+        </el-row>
+        <div class='tabPanle'>
+            <el-row :gutter="12">
+                <el-col :span="12">
+                    <el-card shadow="hover">
+                        <el-collapse value='AttackType' @change="handleChangeAttackType">
+                            <el-collapse-item name="AttackType">
+                                <template slot="title">
+                                    <el-row class="tbarpanel">
+                                        <el-col :span="2">
+                                            <label>攻击类型</label>
+                                        </el-col>
+                                        <el-col :span="4" :offset='16'>
+                                            <el-select v-model="DatetimeSelect" size='mini' placeholder="请选择">
+                                                <el-option
+                                                v-for="item in this.DatetimeOptions"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                                </el-option>
+                                            </el-select>
+                                        </el-col>
+                                        <el-col :span="2">
+                                            <el-button @click.native.stop="loadAttackType" size='mini' circle icon="el-icon-refresh" style="position:relative;top:0px;left:1px"></el-button>
+                                        </el-col>    
+                                    </el-row>
+                                </template>
+                                <AttackType/>
+                            </el-collapse-item>
+                        </el-collapse>
+                    </el-card>
+                </el-col>
+                <el-col :span="12">
+                    <el-card shadow="hover">
+                        <el-collapse value='Severity' @change="handleChangeSeverity">
+                            <el-collapse-item name="Severity">
+                                <template slot="title">
+                                    <el-row class="tbarpanel">
+                                        <el-col :span="2">
+                                            <label>严重级别</label>
+                                        </el-col>
+                                        <el-col :span="4" :offset='16'>
+                                            <el-select v-model="DatetimeSelect" size='mini' placeholder="请选择">
+                                                <el-option
+                                                v-for="item in this.DatetimeOptions"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                                </el-option>
+                                            </el-select>
+                                        </el-col>
+                                        <el-col :span="2">
+                                            <el-button @click.native.stop="closeAll" size='mini' circle icon="el-icon-refresh" style="position:relative;top:0px;left:1px"></el-button>
+                                        </el-col>    
+                                    </el-row>
+                                </template>
+                                <!-- <AttackType/> -->
+                            </el-collapse-item>
+                        </el-collapse>
+                    </el-card>
+                </el-col>
+            </el-row>
+        </div>
     </div>
 </template>
 
 <script>
-
 // 导入chart组件
 import XChart from '../../Chart/chart.vue'
 
+import Bus from '../../../bus/bus.js'
+import AttackType from './AttackType.vue'
+
+
 export default {
     data() {
-        let chartList = [
-            '<XChart id="attackType" :option="this.attackTypeOption"/>',
-            '<XChart id="severity" :option="severityOption"/>'
+        let DatetimeOptions = [
+            {value : 'hour', label : '最近一小时'},
+            {value : 'day', label : '最近一天'},
+            {value : 'week', label : '最近一周'},
+            {value : 'month', label : '最近一月'}
         ];
         return {
-            showChart : false,
-            autoplay : false,
-            chartList : chartList,
-            attackTypeOption: {
-                chart: {
-                    type: 'bar'
-                },
-                title: {
-                    text: ''
-                },
-                subtitle: {
-                    text: ''
-                },
-                xAxis: {
-                    categories: ['最高收益配置', '我的智能配置', '客户当前配置'],
-                    title: {
-                        text: null
-                    }
-                },
-                credits: {
-                    enabled: false//去掉highcharts.com链接
-                },
-                exporting:{
-                    enabled:false //用来设置是否显示‘打印’,'导出'等功能按钮，不设置时默认为显示
-                },
-                yAxis: {
-                    min: 0,//最小
-                    // max:500,//最大
-                    title: {
-                        text: '',
-                        align: ''
-                    },
-                    labels: {
-                        overflow: 'justify',
-                    // formatter:function(){
-                    //   return this.value+'G';//格式化
-                    //   }
-                    },
-                    //allowDecimals: false,
-                },
-                tooltip: {
-                    valueSuffix: ' 元',//最后显示值
-                    backgroundColor: '#4c4c4c',   // 背景颜色
-                    borderColor: '#4c4c4c',         // 边框颜色
-                    borderRadius: 3,             // 边框圆角
-                    borderWidth: 10,               // 边框宽度
-                    shadow: true,                 // 是否显示阴影
-                    animation: true,              // 是否启用动画效果
-                    useHTML: true,//html
-                    //格式化悬浮显示框
-                    pointFormat: '总资产<b style="color:#0ac6f2;margin: 0 auto 0 10px">{point.y}</b><br/>',
-                    style: {                      // 文字内容相关样式
-                        color: "#ffffff",
-                        fontSize: "12px",
-                        fontWeight: "blod",
-                        fontFamily: "Courir new",
-                        top: '100px',
-                        useHTML: true,//html
-                    },
-                    shape: 'callout'
-                },
-                plotOptions: {
-                    bar: {
-                        dataLabels: {
-                        enabled: false,//是否显示
-                        allowOverlap: true // 允许数据标签重叠
-                        }
-                    }
-                },
-                legend: {
-                    enabled: false //不显示图列
-                },
-                series: [ {
-                    name: '',
-                    data: [133, 156, 300],
-                    color:"#0ac6f2",//设置条形图颜色
-                }, {
-                    name: '',
-                    data: [150, 300, 400],
-                    color:"#57c059",//设置条形图颜色
-                }]
-            }
+            DatetimeSelect : 'hour',
+            DatetimeOptions : DatetimeOptions
         }
     },
     components: {
-        'XChart' : XChart
+        'AttackType' : AttackType
+    },
+    methods : {
+        expandAll () {
+
+        },
+        closeAll () {
+
+        },
+        handleChangeAttackType () {
+            
+        },
+        loadAttackType(){
+            Bus.$emit('loadattacktype', this.DatetimeSelect);
+        }
     }
 }
 </script>
 
-<style>
-    #attackType {
-        width: 600px;
-        height: 400px;
-        margin: 40px auto;
-        border-top:1px solid #d0d0d0;
-		border-left:1px solid #d0d0d0;
-		border-right:1px solid #d0d0d0;
-		border-bottom:1px solid #d0d0d0;
+<style scoped>
+    #RulesStatistics{
+        height : 100%;
+    }
+
+    .el-button{
+        position : relative;
+        bottom: 5px;
+        right: 5px;
+    }
+
+    .btn {
+        height : 49px;
+        text-align: left;
+		background-color:white;
+        border-bottom:1px solid #d0d0d0;
+    }
+
+    .el-row {
+        padding: 15px;
+    }
+
+    /* .el-collapse-item__content {
+        padding-bottom: 0 !important;
+    } */
+
+    .tbarpanel {
+        display : contents;
+        padding : 0;
+    }
+
+    .tabPanle {
+        overflow: auto;
+        height: 100%;
     }
 </style>
