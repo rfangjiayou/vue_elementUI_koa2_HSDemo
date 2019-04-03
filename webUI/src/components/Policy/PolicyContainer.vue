@@ -45,6 +45,7 @@ export default {
         text-align: center;
         padding: 0px;
         border-left:1px solid #d0d0d0;
+		overflow: hidden;
     }
 
     .el-form-item--mini .el-form-item__content, .el-form-item--mini .el-form-item__label {
