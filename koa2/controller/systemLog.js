@@ -21,10 +21,10 @@ class controllerSyslog {
     static async getAttackType (ctx, next) {
         try {
             let query = ctx.query;
-            let returnData = await syslogModel.getObjectByLimit(query);
+            let returnData = await syslogModel.getAttackType(query);
             ctx.body = {
-                result : returnData.rows,
-                total : returnData.count
+                result : returnData,
+                total : returnData.length
             };
         } catch (err) {
             ctx.response.status = err.statusCode || err.status || 500;

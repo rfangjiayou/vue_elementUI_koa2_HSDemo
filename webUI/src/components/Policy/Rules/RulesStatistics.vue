@@ -45,7 +45,7 @@
                                             <label>严重级别</label>
                                         </el-col>
                                         <el-col :span="4" :offset='16'>
-                                            <el-select v-model="DatetimeSelect" size='mini' placeholder="请选择">
+                                            <el-select v-model="DatetimeSelect" @change='this.loadAttackType' size='mini' placeholder="请选择">
                                                 <el-option
                                                 v-for="item in this.DatetimeOptions"
                                                 :key="item.value"
@@ -100,8 +100,13 @@ export default {
         closeAll () {
 
         },
-        handleChangeAttackType () {
-            
+        handleChangeAttackType (active) {
+            if(active.length > 0){
+                this.loadAttackType();
+            }
+        },
+        handleChangeSeverity () {
+
         },
         loadAttackType(){
             Bus.$emit('loadattacktype', this.DatetimeSelect);

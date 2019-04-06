@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 let db = require('../config/db');
 let syslog = db.import('../schema/systemLog');
 
@@ -24,6 +25,29 @@ let writeSyslog = (total) => {
     }
 };
 
+let getInterVal = (interval) => {
+    let now = new Date().getTime(),
+        intervalData = '';
+    switch(interval){
+        case 'hour' : 
+            intervalData = 60 * 60 * 1000;
+            break;
+        case 'day' : 
+            intervalData = 24 * 60 * 60 * 1000;
+            break;
+        case 'week' : 
+            intervalData = 7 * 24 * 60 * 60 * 1000;
+            break;
+        case 'month' : 
+            intervalData = 30 * 24 * 60 * 60 * 1000;
+            break;
+        default :
+            intervalData = 60 * 60 * 1000;
+            break;
+    }
+    return new Date(now - intervalData);
+};
+
 class syslogModel {
     static async getObject () {
         return await syslog.findAll({
@@ -43,6 +67,23 @@ class syslogModel {
                 ['time', 'DESC']
             ]
         });
+    }
+
+    static async getAttackType (query) {
+        let groupBy = query.groupBy,
+            interval = getInterVal(query.interval);
+        return await syslog.findAll({
+            attributes:[groupBy, [db.fn('SUM', db.col('hit_count')), 'hit_count']],   //返回的字段
+            group:groupBy, 
+            where: {
+                time : {
+                    [Sequelize.Op.gte] : interval
+                }
+            },
+            raw:true,
+            logging:true
+        });
+        // return await syslog.aggregate(groupBy, [db.fn('SUM', db.col('hit_count')), 'sum']);
     }
 
     static async createObject (data) {
