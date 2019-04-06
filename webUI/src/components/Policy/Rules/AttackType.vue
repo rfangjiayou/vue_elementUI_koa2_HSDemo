@@ -1,18 +1,20 @@
 <template>
     <div id="AttackType">
-        <XChart id="attackType" :option="this.attackTypeOption"/>
+        <XChart id="attackType" :option="this.attackTypeOption" ref='AttackType'/>
     </div>
 </template>
 
 <script>
 // 导入chart组件
 import XChart from '../../Chart/chart.vue'
+import HighCharts from 'highcharts'
 
 import Bus from '../../../bus/bus.js'
 
 export default {
     data() {
         return {
+            chartData : [],
             attackTypeOption: {
                 chart: {
                     type: 'bar'
@@ -82,7 +84,7 @@ export default {
                 legend: {
                     enabled: true //不显示图列
                 },
-                series: [ {
+                series: [/*  {
                     name: '',
                     data: [133, 156, 300],
                     color:"#0ac6f2",//设置条形图颜色
@@ -90,7 +92,7 @@ export default {
                     name: '',
                     data: [150, 300, 400],
                     color:"#57c059",//设置条形图颜色
-                }]
+                } */]
             }
         }
     },
@@ -102,14 +104,18 @@ export default {
             let url = '/api/systemlog/getAttackType';
             this.$axios.get(url, {
                 params : {
-                    'interval' : interval
+                    'interval' : interval,
+                    'groupBy' : 'protection_type'
                 }
             })
             .then((response) => {
-
+                if(response.status == 200){
+                    this.chartData = response.data.result;
+                    this.renderChart(this.chartData);
+                }
             })
             .catch((error) => {
-                if(error.response.status == 401){
+                if(error.response && error.response.status == 401){
                     window.location.reload();
                     this.$message = {
                         type: 'error',
@@ -118,6 +124,24 @@ export default {
                 }
                 console.log(error);
             });
+        },
+        renderChart (data) {
+            if(data.length > 0) {
+                this.attackTypeOption.series = [];
+                let series = [],
+                    simpleSeries = {
+                        name : '',
+                        data : '',
+                        color : '#57c059'
+                    };
+                data.forEach(element => {
+                    simpleSeries.name = element.protection_type;
+                    simpleSeries.data = element.hit_count;
+                    this.attackTypeOption.series.push(simpleSeries);
+                });
+                HighCharts.chart('attackType',this.attackTypeOption)
+                // HighCharts.addSeries(series);
+            }
         }
     },
     mounted () {
