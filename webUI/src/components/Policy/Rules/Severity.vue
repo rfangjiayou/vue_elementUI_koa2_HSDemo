@@ -1,5 +1,5 @@
 <template>
-    <div id="AttackType"/>
+    <div id="Severity"/>
 </template>
 
 <script>
@@ -11,24 +11,19 @@ import Bus from '../../../bus/bus.js'
 export default {
     data() {
         return {
-            id : 'AttackType',
+            id : 'Severity',
             chartObj : '',
             chartData : [],
+            total : 0,
             attackTypeOption: {
                 chart: {
-                    type: 'bar'
+                    type: 'pie'
                 },
                 title: {
                     text: ''
                 },
                 subtitle: {
                     text: ''
-                },
-                xAxis: {
-                    categories: [],
-                    title: {
-                        text: ''
-                    }
                 },
                 credits: {
                     enabled: false//去掉highcharts.com链接
@@ -45,9 +40,9 @@ export default {
                     },
                     labels: {
                         overflow: 'justify',
-                    // formatter:function(){
-                    //   return this.value+'G';//格式化
-                    //   }
+                    /* formatter:function(){
+                      return 2222+'G';//格式化
+                      } */
                     },
                     //allowDecimals: false,
                 },
@@ -73,15 +68,25 @@ export default {
                     shape: 'callout'
                 },
                 plotOptions: {
-                    bar: {
+                    pie: {
+                        size : '60%',
                         dataLabels: {
-                            enabled: false,//是否显示
+                            enabled: true,//是否显示
                             allowOverlap: true // 允许数据标签重叠
                         }
                     }
                 },
                 legend: {
-                    enabled: true //显示图列
+                    enabled: true, //显示图列
+                    itemStyle : {
+                        cursor : 'default'
+                    },
+                    itemMarginBottom : 3,
+                    labelFormat : '{name}: {y}',
+                    align : 'center',
+                    layout : 'horizontal',
+                    margin : 0,
+                    verticalAlign : 'bottom' //top
                 },
                 series: []
             }
@@ -90,12 +95,12 @@ export default {
     components: {
     },
     methods : {
-        loadAttackType (interval) {
-            let url = '/api/systemlog/getAttackType';
+        loadSeverity (interval) {
+            let url = '/api/systemlog/getSeverity';
             this.$axios.get(url, {
                 params : {
                     'interval' : interval,
-                    'groupBy' : 'protection_type'
+                    'groupBy' : 'severity'
                 }
             })
             .then((response) => {
@@ -124,43 +129,53 @@ export default {
             while(currentSeries.length > 0) {
                 currentSeries[0].remove(false);
             }
+            this.total = 0;
             if(data.length > 0) {
-                let categories = [],
-                    seriesList = [];
-
                 let series = {
-                    name : '攻击类型',
+                    name : '',
+                    color : '',
                     data : []
                 };
                 data.forEach(element => {
-                    categories.push(element.protection_type);
-                    series.data.push(parseInt(element.hit_count));
+                    let point = {
+                        name : '',
+                        color : '',
+                        y : ''
+                    }
+                    if(element.severity == 0){
+                        point.name = '低';
+                        point.color = '#4C9EDF';
+                    }else if(element.severity == 1) {
+                        point.name = '中';
+                        point.color = '#E4CB11';
+                    }else if(element.severity == 2) {
+                        point.name = '高';
+                        point.color = '#EE8A07';
+                    }else if(element.severity == 3) {
+                        point.name = '严重';
+                        point.color = '#D83C3D';
+                    }
+                    point.y = parseInt(element.hit_count);
+                    series.data.push(point);
+
+                    this.total += parseInt(point.y);
                 });
                 this.chartObj.addSeries(series, false);
-
-                let xAxis = this.chartObj.get();
-                xAxis.setCategories(categories, false);
             }
             this.chartObj.redraw();
         }
     },
     mounted () {
-        Bus.$on('loadattacktype', (interval) => {
-            this.loadAttackType(interval);
+        Bus.$on('loadseverity', (interval) => {
+            this.loadSeverity(interval);
         });
         this.initChart();
     },
     beforeDestroy () {
-        Bus.$off('loadattacktype');
+        Bus.$off('loadseverity');
     }
 }
 </script>
 
 <style>
-    #attackType {
-       /*  border-top:1px solid #d0d0d0;
-		border-left:1px solid #d0d0d0;
-		border-right:1px solid #d0d0d0;
-		border-bottom:1px solid #d0d0d0; */
-    }
 </style>
