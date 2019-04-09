@@ -8,7 +8,7 @@
             <el-row :gutter="12">
                 <el-col :span="12">
                     <el-card shadow="hover">
-                        <el-collapse value='AttackType' @change="handleChangeAttackType">
+                        <el-collapse v-model="activeNames" @change="handleChangeAttackType">
                             <el-collapse-item name="AttackType">
                                 <template slot="title">
                                     <el-row class="tbarpanel">
@@ -16,7 +16,7 @@
                                             <label>攻击类型</label>
                                         </el-col>
                                         <el-col :span="4" :offset='16'>
-                                            <el-select v-model="DatetimeSelect" size='mini' placeholder="请选择">
+                                            <el-select v-model="DatetimeSelect" @change="changeDate($event, 'attack')" size='mini' placeholder="请选择">
                                                 <el-option
                                                 v-for="item in this.DatetimeOptions"
                                                 :key="item.value"
@@ -37,7 +37,7 @@
                 </el-col>
                 <el-col :span="12">
                     <el-card shadow="hover">
-                        <el-collapse value='Severity' @change="handleChangeSeverity">
+                        <el-collapse v-model="activeNames" @change="handleChangeSeverity">
                             <el-collapse-item name="Severity">
                                 <template slot="title">
                                     <el-row class="tbarpanel">
@@ -45,7 +45,7 @@
                                             <label>严重级别</label>
                                         </el-col>
                                         <el-col :span="4" :offset='16'>
-                                            <el-select v-model="DatetimeSelect" @change='this.loadAttackType' size='mini' placeholder="请选择">
+                                            <el-select v-model="DatetimeSelect" @change="changeDate($event, 'severity')" size='mini' placeholder="请选择">
                                                 <el-option
                                                 v-for="item in this.DatetimeOptions"
                                                 :key="item.value"
@@ -55,11 +55,11 @@
                                             </el-select>
                                         </el-col>
                                         <el-col :span="2">
-                                            <el-button @click.native.stop="closeAll" size='mini' circle icon="el-icon-refresh" style="position:relative;top:0px;left:1px"></el-button>
+                                            <el-button @click.native.stop="loadSeverity" size='mini' circle icon="el-icon-refresh" style="position:relative;top:0px;left:1px"></el-button>
                                         </el-col>    
                                     </el-row>
                                 </template>
-                                <!-- <AttackType/> -->
+                                <Severity/>
                             </el-collapse-item>
                         </el-collapse>
                     </el-card>
@@ -70,12 +70,9 @@
 </template>
 
 <script>
-// 导入chart组件
-import XChart from '../../Chart/chart.vue'
-
 import Bus from '../../../bus/bus.js'
 import AttackType from './AttackType.vue'
-
+import Severity from './Severity.vue'
 
 export default {
     data() {
@@ -86,30 +83,47 @@ export default {
             {value : 'month', label : '最近一月'}
         ];
         return {
+            activeNames : [],
             DatetimeSelect : 'hour',
             DatetimeOptions : DatetimeOptions
         }
     },
     components: {
-        'AttackType' : AttackType
+        'AttackType' : AttackType,
+        'Severity' : Severity
     },
     methods : {
         expandAll () {
-
+            this.activeNames.push('AttackType');
+            this.activeNames.push('Severity');
+            this.loadAttackType();
+            this.loadSeverity();
         },
         closeAll () {
-
+            this.activeNames = [];
+        },
+        changeDate (value, type) {
+            if(type == 'attack'){
+                this.loadAttackType();
+            }else if(type == 'severity'){
+                this.loadSeverity();
+            }
         },
         handleChangeAttackType (active) {
             if(active.length > 0){
                 this.loadAttackType();
             }
         },
-        handleChangeSeverity () {
-
+        handleChangeSeverity (active) {
+            if(active.length > 0){
+                this.loadSeverity();
+            }
         },
         loadAttackType(){
             Bus.$emit('loadattacktype', this.DatetimeSelect);
+        },
+        loadSeverity () {
+            Bus.$emit('loadseverity', this.DatetimeSelect);
         }
     }
 }
