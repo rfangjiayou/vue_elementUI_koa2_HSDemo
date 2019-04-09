@@ -21,7 +21,23 @@ class controllerSyslog {
     static async getAttackType (ctx, next) {
         try {
             let query = ctx.query;
-            let returnData = await syslogModel.getAttackType(query);
+            let returnData = await syslogModel.aggregateData(query);
+            ctx.body = {
+                result : returnData,
+                total : returnData.length
+            };
+        } catch (err) {
+            ctx.response.status = err.statusCode || err.status || 500;
+            ctx.response.body = {
+                message: err.message
+            };
+        }
+    }
+
+    static async getSeverity (ctx, next) {
+        try {
+            let query = ctx.query;
+            let returnData = await syslogModel.aggregateData(query);
             ctx.body = {
                 result : returnData,
                 total : returnData.length

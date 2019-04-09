@@ -69,7 +69,7 @@ class syslogModel {
         });
     }
 
-    static async getAttackType (query) {
+    static async aggregateData (query) {
         let groupBy = query.groupBy,
             interval = getInterVal(query.interval);
         return await syslog.findAll({
